@@ -1,8 +1,8 @@
 <template>
   <div class="dashboard-container">
     <div class="dashboard-text">name: {{ name }}</div>
-    <div>11</div>
-    <div>11</div>
+    <!-- <svg-icon icon-class="dashboard" />
+    <svg-icon icon-class="eye" /> -->
   </div>
 </template>
 
