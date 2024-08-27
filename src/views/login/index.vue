@@ -31,9 +31,9 @@ export default {
   data() {
     return {
       LoginForm: {
-        mobile: '',
-        password: '',
-        isAgrge: false
+        mobile: process.env.NODE_ENV === 'development' ? '13800000002' : '',
+        password: process.env.NODE_ENV === 'development' ? 'hm#qd@23!' : '',
+        isAgrge: process.env.NODE_ENV === 'development'
       },
       LoginRules: {
         mobile: [{
@@ -69,9 +69,10 @@ export default {
   },
   methods: {
     login() {
-      this.$refs.form.validate(isOk => {
+      this.$refs.form.validate(async isOk => {
         if (isOk) {
-          this.$store.dispatch('user/login', this.LoginForm)
+          await this.$store.dispatch('user/login', this.LoginForm)
+          this.$router.push('/')
         }
       })
     }

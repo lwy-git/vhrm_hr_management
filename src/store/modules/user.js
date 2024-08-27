@@ -1,4 +1,5 @@
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import { login } from '@/api/user'
 const state = {
   token: getToken()// 从缓存读取token初始值
 }
@@ -13,10 +14,11 @@ const mutations = {
   }
 }
 const actions = {
-  login(context, data) {
+  async login(context, data) {
     console.log(data)
     // todo 调用接口返回token
-    context.commit('setToken', '123456')
+    const token = await login(data)
+    context.commit('setToken', token)
   }
 
 }
