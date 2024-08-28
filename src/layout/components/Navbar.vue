@@ -7,7 +7,8 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="avatar" class="user-avatar">
+          <img v-if="avatar" :src="avatar" class="user-avatar">
+          <span v-else class="userName">{{ name?.charAt(0) }}</span>
           <span class="name">{{ name }}</span>
           <i class="el-icon-setting" />
         </div>
@@ -121,6 +122,15 @@ export default {
         position: relative;
         display: flex;
         align-items: center;
+        .userName{
+          width: 30px;
+          height: 30px;
+          line-height: 30px;
+          border-radius: 50%;
+          text-align: center;
+          color: #fff;
+          background-color: #04c9be;
+        }
         .name{
        margin-right: 10px;
        font-size: 16px;
