@@ -9,7 +9,7 @@ const mutations = {
     state.token = token
     setToken(token)// 获取的token同步到缓存
   },
-  removeToken() {
+  removeToken(state) {
     state.token = null// 删除vuex中的token
     removeToken()// 退出时从缓存删除token
   },
@@ -27,6 +27,10 @@ const actions = {
   async getUserInfo(context) {
     const res = await getUserInfo()
     context.commit('setUserInfo', res)
+  },
+  logout(context) {
+    context.commit('removeToken')
+    context.commit('setUserInfo', {})
   }
 }
 export default {
