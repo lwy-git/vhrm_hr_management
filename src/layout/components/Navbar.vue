@@ -21,7 +21,8 @@
           <a target="_blank" href="https://gitee.com/longwangyang/lwyhr">
             <el-dropdown-item>项目地址</el-dropdown-item>
           </a>
-          <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
+          <!-- prevent阻止a标签默认事件 -->
+          <a target="_blank" @click.prevent="updatePassword">
             <el-dropdown-item>修改密码</el-dropdown-item>
           </a>
           <!-- native修饰符注册组件的根元素的原生事件 -->
@@ -31,6 +32,32 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+    <!-- sync
+      接受isShow的值 -->
+    <el-dialog
+      width="500px"
+      append-to-body="true"
+      title="
+    修改密码"
+      :visible.sync="isShow"
+    >
+
+      <el-form label-width="120px">
+        <el-form-item show-password label="旧密码">
+          <el-input size="small" />
+        </el-form-item>
+        <el-form-item show-password label="新密码">
+          <el-input size="small" />
+        </el-form-item>
+        <el-form-item show-password label="重置密码">
+          <el-input size="small" />
+        </el-form-item>
+        <el-form-item>
+          <el-button size="mini" type="primary">确认修改</el-button>
+          <el-button size="mini">取消</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
@@ -44,6 +71,11 @@ export default {
     Breadcrumb,
     Hamburger
   },
+  data() {
+    return {
+      isShow: false
+    }
+  },
   computed: {
     ...mapGetters([
       'sidebar',
@@ -52,6 +84,9 @@ export default {
     ])
   },
   methods: {
+    updatePassword() {
+      this.isShow = !this.isShow
+    },
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
