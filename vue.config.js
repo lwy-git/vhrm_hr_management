@@ -39,6 +39,7 @@ module.exports = {
     proxy: {
       // path:目标服务器
       '/api': {
+        // target: 'http://localhost:8081/'  //本地服务
         target: 'https://heimahr.itheima.net/'
       }
 

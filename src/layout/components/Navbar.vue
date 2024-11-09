@@ -42,19 +42,19 @@
       :visible.sync="isShow"
     >
 
-      <el-form label-width="120px">
-        <el-form-item show-password label="旧密码">
-          <el-input size="small" />
+      <el-form ref="passForm" label-width="120px" :model="passForm" :rules="rules" @close="changeCancel">
+        <el-form-item show-password label="旧密码" prop="oldPassword">
+          <el-input v-model="passForm.oldPassword" show-password size="small" />
         </el-form-item>
-        <el-form-item show-password label="新密码">
-          <el-input size="small" />
+        <el-form-item show-password label="新密码" prop="newPassword">
+          <el-input v-model="passForm.newPassword" show-password size="small" />
         </el-form-item>
-        <el-form-item show-password label="重置密码">
-          <el-input size="small" />
+        <el-form-item show-password label="重置密码" prop="confirmPassword">
+          <el-input v-model="passForm.confirmPassword" show-password size="small" />
         </el-form-item>
         <el-form-item>
-          <el-button size="mini" type="primary">确认修改</el-button>
-          <el-button size="mini">取消</el-button>
+          <el-button size="mini" type="primary" @click="changeConfirm">确认修改</el-button>
+          <el-button size="mini" @click="changeCancel">取消</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -65,7 +65,7 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
-
+import { updatePass } from '@/api/user'
 export default {
   components: {
     Breadcrumb,
@@ -73,7 +73,23 @@ export default {
   },
   data() {
     return {
-      isShow: false
+      isShow: false,
+      passForm: {
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      },
+      rules: {
+        oldPassword: [{ required: true, message: '旧密码不能为空', trigger: 'blur' }],
+        newPassword: [{ required: true, message: '新密码不能为空', trigger: 'blur' }, { min: 6, message: '新密码至少6位', trigger: 'blur' }],
+        confirmPassword: [{ required: true, message: '重置密码不能为空', trigger: 'blur' }, { validator: (rule, value, callback) => {
+          if (value !== this.passForm.newPassword) {
+            callback(new Error('重置密码与新密码不一致'))
+          } else {
+            callback()
+          }
+        }, trigger: 'blur' }]
+      }
     }
   },
   computed: {
@@ -93,6 +109,20 @@ export default {
     async logout() {
       await this.$store.dispatch('user/logout')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    },
+    changeConfirm() {
+      this.$refs.passForm.validate(async isOk => {
+        if (isOk) {
+          await updatePass(this.passForm)
+          this.$message.success('修改密码成功')
+          this.$refs.passForm.resetFields()// 重置密码
+          this.isShow = false // 关闭弹窗
+        }
+      })
+    },
+    changeCancel() {
+      this.$refs.passForm.resetFields()// 重置密码
+      this.isShow = false // 关闭弹窗
     }
   }
 }
