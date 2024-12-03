@@ -1,6 +1,4 @@
-/**
- * Created by PanJiaChen on 16/11/18.
- */
+
 /**
  *
  * 列表型数据转化树形
@@ -11,10 +9,12 @@ export function transListToTreeData(list, rootValue) {
   list.forEach(item => {
     if (item.pid === rootValue) {
       // 找到了匹配的节点
-      // 当前节点的id 和 当前节点的子节点的pid是想等的
-      const children = transListToTreeData(list, item.id) // 找到的节点的子节点
-      item.children = children // 将子节点赋值给当前节点
       arr.push(item)
+      // 当前节点的id 和 当前节点的子节点的pid是等的
+      const children = transListToTreeData(list, item.id) // 找到的节点的子节点
+      if (children.length) { item.children = children } // 将子节点赋值给当前节点
+    // 只有当前节点有子节点时才添加children属性，否则会造成级联组件本身就已经是最末端了
+    // 但是发现它的children属性存在，就会呈现不同的表现形式
     }
   })
   return arr

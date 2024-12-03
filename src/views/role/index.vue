@@ -45,7 +45,7 @@
             </template>
             <template v-else>
               <!-- 非编辑状态 -->
-              <el-button size="mini" type="text">分配权限</el-button>
+              <el-button size="mini" type="text" @click="btnPermission(row.id)">分配权限</el-button>
               <el-button
                 size="mini"
                 type="text"
@@ -113,11 +113,36 @@
           </el-row>
         </el-form-item>
       </el-form>
+
+    <!-- 分配权限 -->
+    </el-dialog>
+    <!-- 放置权限弹层 -->
+    <el-dialog :visible.sync="showPermissionDialog" title="分配权限">
+      <!-- 放置权限数据 -->
+      <el-tree
+        ref="permTree"
+        node-key="id"
+        :data="permissionData"
+        :props="{ label: 'name' }"
+        show-checkbox
+        default-expand-all
+        :default-checked-keys="permIds"
+      />
+      <!-- default-checked-keys的属性是设置当前选中的节点,permIds为权限数组，配合node-key确认使用的字段 -->
+      <!-- 当树形结构初次渲染时，会根据 permIds 数组中的 id 值，自动将对应的节点设置为勾选状态 -->
+      <el-row slot="footer" type="flex" justify="center">
+        <el-col :span="6">
+          <el-button type="primary" size="mini" @click="btnPermissionOK">确定</el-button>
+          <el-button size="mini" @click="showPermissionDialog = false">取消</el-button>
+        </el-col>
+      </el-row>
     </el-dialog>
   </div>
 </template>
 <script>
-import { getRoleList, addRole, updateRole, deleteRole } from '@/api/role'
+import { getRoleList, addRole, updateRole, deleteRole, getRoleDetail, assignPerm } from '@/api/role'
+import { getPermissionList } from '@/api/permission'
+import { transListToTreeData } from '@/utils'
 export default {
   name: 'Role',
   data() {
@@ -142,7 +167,11 @@ export default {
         description: [
           { required: true, message: '角色描述不能为空', trigger: 'blur' }
         ]
-      }
+      },
+      showPermissionDialog: false, // 分配权限 弹出框是否显示
+      permissionData: [], // 权限数据，可分配的权限
+      currentRoleId: null, // 记录当前点击的角色id
+      permIds: []// 当前角色所拥有的权限数据
     }
   },
   created() {
@@ -240,6 +269,27 @@ export default {
             message: '已取消删除'
           })
         })
+    },
+    // 分配权限
+    async  btnPermission(id) {
+      this.currentRoleId = id
+      const { permIds } = await getRoleDetail(id)
+      this.permIds = permIds
+      this.permissionData = transListToTreeData(await getPermissionList(), 0)
+      this.showPermissionDialog = true
+    },
+    // 确定分配权限
+
+    // 点击确定时触发
+    async  btnPermissionOK() {
+      console.log('permIds', this.$refs.permTree.getCheckedKeys())
+
+      await assignPerm({
+        id: this.currentRoleId,
+        permIds: this.$refs.permTree.getCheckedKeys()
+      })
+      this.$message.success('角色分配权限成功')
+      this.showPermissionDialog = false
     }
   }
 }

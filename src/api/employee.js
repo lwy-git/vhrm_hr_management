@@ -40,3 +40,45 @@ export function delEmployee(id) {
     url: `/sys/user/${id}`
   })
 }
+
+// 新增员工
+export function addEmployee(data) {
+  return request({
+    url: '/sys/user',
+    method: 'post',
+    data
+  })
+}
+
+// 获取员工详情
+export function getEmployeeDetail(id) {
+  return request({
+    url: `/sys/user/${id}`
+  })
+}
+
+// 编辑更新员工详情
+
+export function updateEmployee(data) {
+  return request({
+    url: `/sys/user/${data.id}`,
+    method: 'put',
+    data
+  })
+}
+
+// 获取可用角色，进行分配角色
+export function getEnableRoleList() {
+  return request({
+    url: '/sys/role/list/enabled'
+  })
+}
+
+// 员工分配角色
+export function assignRole(data) {
+  return request({
+    url: '/sys/user/assignRoles',
+    method: 'put',
+    data
+  })
+}

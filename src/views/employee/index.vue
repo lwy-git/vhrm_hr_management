@@ -2,6 +2,7 @@
   <div class="container">
     <div class="app-container">
       <div class="left">
+        <span class="left-name">员工名称：</span>
         <el-input
           v-model="queryParams.keyword"
           style="margin-bottom:10px"
@@ -14,7 +15,7 @@
       </div>
       <div class="right">
         <el-row class="opeate-tools" type="flex" justify="end">
-          <el-button size="mini" type="primary">添加员工</el-button>
+          <el-button size="mini" type="primary" @click="$router.push('/employee/detail')">添加员工</el-button>
           <el-button size="mini" @click="showExcelDialog = true">excel导入</el-button>
           <el-button size="mini" @click="exportEmployee">excel导出</el-button>
         </el-row>
@@ -40,8 +41,8 @@
           <el-table-column prop="timeOfEntry" label="入职时间" sortable />
           <el-table-column label="操作" width="200px" align="center">
             <template v-slot="{row}">
-              <el-button size="mini" type="text">查看</el-button>
-              <el-button size="mini" type="text">角色</el-button>
+              <el-button size="mini" type="text" @click="$router.push(`/employee/detail/${row.id}`)">查看</el-button>
+              <el-button size="mini" type="text" @click="btnRole(row.id)">角色</el-button>
               <el-button size="mini" type="text" @click="btnDel(row.id)">删除</el-button>
             </template>
           </el-table-column>
@@ -64,11 +65,30 @@
     </div>
     <!-- excel导入弹层 .sync双向绑定数据控制弹窗显隐  uploadSuccess监听上传成功-->
     <ImportExcel :show-excel-dialog.sync="showExcelDialog" @uploadSuccess="getEmployeeList" />
+    <!-- 角色弹窗 -->
+    <el-dialog :visible.sync="showRoleDialog" title="分配角色">
+      <!-- 弹层内容 -->
+      <!-- checkbox -->
+      <el-checkbox-group v-model="roleIds">
+        <!-- 放置n个的checkbox  要执行checkbox的存储值 item.id-->
+        <el-checkbox
+          v-for="item in roleList"
+          :key="item.id"
+          :label="item.id"
+        >{{ item.name }}</el-checkbox>
+      </el-checkbox-group>
+      <el-row slot="footer" type="flex" justify="center">
+        <el-col :span="6">
+          <el-button type="primary" size="mini" @click="btnRoleOK">确定</el-button>
+          <el-button size="mini" @click="showRoleDialog = false">取消</el-button>
+        </el-col>
+      </el-row>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getEmployeeList, exportEmployee, delEmployee } from '@/api/employee'
+import { getEmployeeList, exportEmployee, delEmployee, getEnableRoleList, assignRole, getEmployeeDetail } from '@/api/employee'
 import FileSaver from 'file-saver'
 import ImportExcel from './components/importExcel.vue'
 export default {
@@ -88,12 +108,18 @@ export default {
       },
       // 存储员工列表
       employeeList: [],
-      total: 0 // 记录员工的总数
+      total: 0, // 记录员工的总数
+      showRoleDialog: false, // 用来控制角色弹层的显示
+      roleList: [], // 接收角色列表
+      roleIds: [], // 用来双向绑定数据的
+      currentUserId: null // 用来记录当前点击的用户id
     }
   },
   created() {
     // 初始化获取员工列表
     this.getEmployeeList()
+    // 获取可用角色列表
+    this.getEnableRoleList()
   },
   methods: {
     // 获取员工列表的方法
@@ -147,6 +173,30 @@ export default {
             message: '已取消删除'
           })
         })
+    },
+    // 点击查看可用角色
+    // 点击角色按钮弹出层
+    async btnRole(id) {
+      this.showRoleDialog = true
+      this.roleList = await getEnableRoleList()
+      console.log('roleList', this.roleList)
+      // 记录当前点击的id 因为后边 确定取消要存取给对应的用户
+      this.currentUserId = id
+      const { roleIds } = await getEmployeeDetail(id)
+      this.roleIds = roleIds
+      console.log('roleIds: ', this.roleIds)
+
+      this.showRoleDialog = true // 调整顺序
+    },
+    // 点击分配角色的确定
+    async  btnRoleOK() {
+      console.log('roleIds: ', this.roleIds)
+      await assignRole({
+        id: this.currentUserId,
+        roleIds: this.roleIds
+      })
+      this.$message.success('分配员工角色成功')
+      this.showRoleDialog = false
     }
   }
 }
@@ -162,9 +212,17 @@ export default {
   color: gray;
 }
   .left {
-    width: 280px;
+    display:flex;
+    width: 350px;
+    align-items: center;
     padding: 20px;
     // border-right: 1px solid #eaeef4;
+.left-name{
+  width: 100px;
+  height:100%;
+  font-size: 15px;
+  color:#666666;
+}
   }
   .right {
     flex: 1;
