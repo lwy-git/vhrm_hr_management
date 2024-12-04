@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'has-logo':showLogo}">
+  <div :class="{ 'has-logo': showLogo }">
     <logo v-if="showLogo" :collapse="isCollapse" />
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu
@@ -13,7 +13,12 @@
         mode="vertical"
       >
         <!-- 遍历路由信息，生成 sidebar-item 组件 -->
-        <sidebar-item v-for="route in routes" :key="route.path" :item="route" :base-path="route.path" />
+        <sidebar-item
+          v-for="route in routes"
+          :key="route.path"
+          :item="route"
+          :base-path="route.path"
+        />
       </el-menu>
     </el-scrollbar>
   </div>
@@ -28,17 +33,18 @@ import variables from '@/styles/variables.scss'
 export default {
   components: { SidebarItem, Logo },
   computed: {
-    ...mapGetters([
-      'sidebar'
-    ]),
-    // 获取路由信息
-    routes() {
-      return this.$router.options.routes
-    },
+    // 路由信息的计算属性
+    // mapGetters获取getters
+    ...mapGetters(['sidebar', 'routes']),
+
+    // routes() {
+    //   // 返回所有的路由信息
+    //   return this.$router.options.routes
+    // },
     activeMenu() {
       const route = this.$route
       const { meta, path } = route
-      // if set path, the sidebar will highlight the path you set
+      // 如果设置了路径，侧边栏将会高亮显示你所设置的路径
       if (meta.activeMenu) {
         return meta.activeMenu
       }

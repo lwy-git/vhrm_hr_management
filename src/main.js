@@ -5,7 +5,6 @@ import 'normalize.css/normalize.css' // A modern alternative to CSS resets
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 // import locale from 'element-ui/lib/locale/lang/en' // lang i18n
-
 import '@/styles/index.scss' // global css
 
 import App from './App'
@@ -41,4 +40,20 @@ new Vue({
   router,
   store,
   render: h => h(App)
+})
+
+// 封装自定义指令 用来控制操作权
+Vue.directive('permission', {
+  // 会在指令作用的元素插入到页面完成以后触发
+  inserted(el, binding) {
+    // el 指令作用的元素的dom对象
+    console.log(el)
+    const points = store.state.user.userInfo?.roles?.points || [] // 当前用户信息的操作权
+    if (!points.includes(binding.value)) {
+      // 不存在就要删除或者禁用
+      el.remove() // 删除元素
+      // el.disabled = true// 禁用元素
+    }
+  }
+
 })
