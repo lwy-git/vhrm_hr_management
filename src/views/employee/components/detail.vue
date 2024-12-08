@@ -74,6 +74,7 @@
             <el-col :span="12">
               <el-form-item label="员工头像">
                 <!-- 放置上传图片 -->
+                <imageUpload v-model="userInfo.staffPhoto" />
               </el-form-item>
             </el-col>
           </el-row>
@@ -91,10 +92,12 @@
 
 <script>
 import detailCascader from './detailCascader.vue'
+import imageUpload from './imageUpload.vue'
 import { addEmployee, getEmployeeDetail, updateEmployee } from '@/api/employee'
 export default {
   components: {
-    detailCascader
+    detailCascader,
+    imageUpload
   },
   data() {
     return {
@@ -105,7 +108,8 @@ export default {
         formOfEmployment: null, // 聘用形式
         departmentId: null, // 部门id
         timeOfEntry: '', // 入职时间
-        correctionTime: '' // 转正时间
+        correctionTime: '', // 转正时间
+        staffPhoto: '' // 头像
       },
       rules: {
         username: [
