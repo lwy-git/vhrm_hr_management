@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="app-container">
-      <div class="left">
+      <!-- <div class="left">
         <span class="left-name">员工名称：</span>
         <el-input
           v-model="queryParams.keyword"
@@ -12,6 +12,22 @@
           placeholder="输入员工姓名全员搜索"
           @input="changeValue"
         />
+      </div> -->
+      <!-- 搜索栏 -->
+      <div class="search-bar">
+        <el-input
+          v-model="queryParams.keyword"
+          placeholder="请输入员工姓名搜索"
+          style="width: 200px; margin-right: 10px"
+          size="small"
+          @keyup.enter.native="handleSearch"
+        />
+        <el-button
+          size="small"
+          type="primary"
+          @click="handleSearch"
+        >搜索</el-button>
+        <el-button size="small" @click="handleReset">重置</el-button>
       </div>
       <div class="right">
         <el-row class="opeate-tools" type="flex" justify="end">
@@ -133,14 +149,28 @@ export default {
       this.queryParams.page = newPage // 赋值新页码
       this.getEmployeeList() // 查询数据
     },
-    changeValue() {
-      // 单位时间内只执行最后一次
-      // this的实例上赋值了一个timer的属性
-      clearTimeout(this.timer) // 清理上一次的定时器
-      this.timer = setTimeout(() => {
-        this.queryParams.page = 1
-        this.getEmployeeList()
-      }, 300)
+    // changeValue() {
+    //   // 单位时间内只执行最后一次
+    //   // this的实例上赋值了一个timer的属性
+    //   clearTimeout(this.timer) // 清理上一次的定时器
+    //   this.timer = setTimeout(() => {
+    //     this.queryParams.page = 1
+    //     this.getEmployeeList()
+    //   }, 300)
+    // },
+    // 搜索
+    handleSearch() {
+      this.queryParams.page = 1
+      this.getEmployeeList()
+    },
+    // 重置
+    handleReset() {
+      this.queryParams = {
+        page: 1,
+        pagesize: 10,
+        keyword: ''
+      }
+      this.getEmployeeList()
     },
     // 导出excel表格
     async  exportEmployee() {
