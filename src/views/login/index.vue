@@ -86,7 +86,7 @@ export default {
   height: 100vh;
   .logo {
     flex: 3;
-    background: rgba(38, 72, 176) url(../../assets/common/changli.jpg)
+    background: rgba(38, 72, 176) url(../../assets/common/bg4.jpg)
       no-repeat center / cover;
     border-top-right-radius: 60px;
     display: flex;

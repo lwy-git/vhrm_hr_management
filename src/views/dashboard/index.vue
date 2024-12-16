@@ -1,677 +1,394 @@
 <template>
-  <div class="dashboard">
-    <div class="container">
-      <!-- 左侧内容 -->
-      <div class="left">
-        <div class="panel">
-          <!-- 个人信息 -->
-          <div class="user-info">
-            <img v-if="avatar" class="avatar" :src="avatar" alt="">
-            <span v-else class="username">{{ name?.charAt(0) }}</span>
-            <div class="company-info">
-              <div class="title">
-                科技有限公司
+  <div class="container">
+    <div class="dashboard-container">
+      <!-- 顶部数据卡片 -->
+      <el-row :gutter="20">
+        <el-col :span="6">
+          <el-card shadow="hover">
+            <div class="data-card">
+              <div class="icon-wrapper bg-blue">
+                <i class="el-icon-user" />
+              </div>
+              <div class="data-content">
+                <div class="data-title">员工总数</div>
+                <div class="data-number">{{ dashboardData.totalEmployees }}</div>
+              </div>
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="6">
+          <el-card shadow="hover">
+            <div class="data-card">
+              <div class="icon-wrapper bg-green">
+                <i class="el-icon-s-custom" />
+              </div>
+              <div class="data-content">
+                <div class="data-title">本月新入职</div>
+                <div class="data-number">{{ dashboardData.newEmployees }}</div>
+              </div>
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="6">
+          <el-card shadow="hover">
+            <div class="data-card">
+              <div class="icon-wrapper bg-orange">
+                <i class="el-icon-office-building" />
+              </div>
+              <div class="data-content">
+                <div class="data-title">部门数量</div>
+                <div class="data-number">{{ dashboardData.departmentCount }}</div>
+              </div>
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="6">
+          <el-card shadow="hover">
+            <div class="data-card">
+              <div class="icon-wrapper bg-red">
+                <i class="el-icon-date" />
+              </div>
+              <div class="data-content">
+                <div class="data-title">平均司龄</div>
+                <div class="data-number">{{ dashboardData.averageYears }}年</div>
+              </div>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
 
-              </div>
-              <div class="depart">{{ name }} ｜ {{ company }}-{{ departmentName }}</div>
+      <!-- 图表区域 -->
+      <el-row :gutter="20" style="margin-top: 20px">
+        <!-- 员工入职趋势图 -->
+        <el-col :span="12">
+          <el-card shadow="hover">
+            <div slot="header">
+              <span>员工入职趋势</span>
             </div>
-          </div>
-          <!-- 代办 -->
-          <div class="todo-list">
-            <div class="todo-item">
-              <span>组织总人数</span>
-              <!-- 起始值 终点值 动画时间 -->
-              <count-to
-                :start-val="0"
-                :end-val="homeData.employeeTotal"
-                :duration="1000"
-              />
+            <div ref="employeeTrend" style="height: 300px" />
+          </el-card>
+        </el-col>
+        <!-- 部门人员分布图 -->
+        <el-col :span="12">
+          <el-card shadow="hover">
+            <div slot="header">
+              <span>部门人员分布</span>
             </div>
-            <div class="todo-item">
-              <span>正式员工</span>
-              <count-to
-                :start-val="0"
-                :end-val="homeData.regularEmployeeTotal"
-                :duration="1000"
-              />
-            </div>
-            <div class="todo-item">
-              <span>合同待签署</span>
-              <count-to
-                :start-val="0"
-                :end-val="homeData.contractSignTotal"
-                :duration="1000"
-              />
-            </div>
-            <div class="todo-item">
-              <span>待入职</span>
-              <count-to
-                :start-val="0"
-                :end-val="homeData.toBeEmployed"
-                :duration="1000"
-              />
-            </div>
-            <div class="todo-item">
-              <span>本月待转正</span>
-              <count-to
-                :start-val="0"
-                :end-val="homeData.toBeConfirmed"
-                :duration="1000"
-              />
-            </div>
-            <div class="todo-item">
-              <span>本月待离职</span>
-              <count-to
-                :start-val="0"
-                :end-val="homeData.toBeDismissed"
-                :duration="1000"
-              />
-            </div>
-            <div class="todo-item">
-              <span>接口总访问</span>
-              <count-to
-                :start-val="0"
-                :end-val="homeData.interfaceAccessTotal"
-                :duration="1000"
-              />
-            </div>
-          </div>
-        </div>
-        <!-- 快捷入口 -->
-        <div class="panel">
-          <div class="panel-title">快捷入口</div>
-          <div class="quick-entry">
-            <div class="entry-item">
-              <div class="entry-icon approval" />
-              <span>假期审批</span>
-            </div>
-            <div class="entry-item">
-              <div class="entry-icon social" />
-              <span>社保管理</span>
-            </div>
-            <div class="entry-item">
-              <div class="entry-icon role" />
-              <span>角色管理</span>
-            </div>
-            <div class="entry-item">
-              <div class="entry-icon salary" />
-              <span>薪资设置</span>
-            </div>
-            <div class="entry-item">
-              <div class="entry-icon bpm" />
-              <span>流程设置</span>
-            </div>
-          </div>
-        </div>
-        <!-- 图表数据 -->
-        <div class="panel">
-          <div class="panel-title">社保申报数据</div>
-          <div class="chart-container">
-            <div class="chart-info">
-              <div class="info-main">
-                <span>申报人数</span>
-                <!-- homeData: {} -->
-                <count-to
-                  :start-val="0"
-                  :end-val="homeData.socialInsurance?.declarationTotal"
-                  :duration="1000"
-                />
+            <div ref="departmentDistribution" style="height: 300px" />
+          </el-card>
+        </el-col>
+      </el-row>
 
-              </div>
-              <div class="info-list">
-                <div class="info-list-item">
-                  <span>待申报(人)</span>
-                  <count-to
-                    :start-val="0"
-                    :end-val="homeData.socialInsurance?.toDeclareTotal"
-                    :duration="1000"
-                  />
-                </div>
-                <div class="info-list-item">
-                  <span>申报中(人)</span>
-                  <count-to
-                    :start-val="0"
-                    :end-val="homeData.socialInsurance?.declaringTotal"
-                    :duration="1000"
-                  />
-                </div>
-                <div class="info-list-item">
-                  <span>已申报(人)</span>
-                  <count-to
-                    :start-val="0"
-                    :end-val="homeData.socialInsurance?.declaredTotal"
-                    :duration="1000"
-                  />
-                </div>
-              </div>
+      <el-row :gutter="20" style="margin-top: 20px">
+        <!-- 员工年龄分布 -->
+        <el-col :span="12">
+          <el-card shadow="hover">
+            <div slot="header">
+              <span>员工年龄分布</span>
             </div>
-            <div class="chart">
-              <!-- 图表 -->
-              <div ref="social" style=" width: 100%; height:100% " />
+            <div ref="ageDistribution" style="height: 300px" />
+          </el-card>
+        </el-col>
+        <!-- 员工学历构成 -->
+        <el-col :span="12">
+          <el-card shadow="hover">
+            <div slot="header">
+              <span>员工学历构成</span>
             </div>
-          </div>
-        </div>
-        <!-- 图表数据 -->
-        <div class="panel">
-          <div class="panel-title">公积金申报数据</div>
-          <div class="chart-container">
-            <div class="chart-info">
-              <div class="info-main">
-                <span>申报人数</span>
-                <count-to
-                  :start-val="0"
-                  :end-val="homeData.providentFund?.declarationTotal"
-                  :duration="1000"
-                />
-              </div>
-              <div class="info-list">
-                <div class="info-list-item">
-                  <span>待申报(人)</span>
-                  <count-to
-                    :start-val="0"
-                    :end-val="homeData.providentFund?.toDeclareTotal"
-                    :duration="1000"
-                  />
-                </div>
-                <div class="info-list-item">
-                  <span>申报中(人)</span>
-                  <count-to
-                    :start-val="0"
-                    :end-val="homeData.providentFund?.declaringTotal"
-                    :duration="1000"
-                  />
-                </div>
-                <div class="info-list-item">
-                  <span>已申报(人)</span>
-                  <count-to
-                    :start-val="0"
-                    :end-val="homeData.providentFund?.declaredTotal"
-                    :duration="1000"
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="chart">
-              <!-- 图表 -->
-              <div ref="provident" style=" width: 100%; height:100% " />
-            </div>
-          </div>
-        </div>
+            <div ref="educationDistribution" style="height: 300px" />
+          </el-card>
+        </el-col>
+      </el-row>
+
+      <!-- 意见箱图标 -->
+      <div class="suggestion-box" @click="handelSuggest()">
+        <i class="el-icon-message" />
       </div>
-      <!-- 右侧内容 -->
-      <div class="right">
-        <!-- 帮助链接 -->
-        <div class="panel">
-          <div class="help">
-            <!-- <div class="help-left">
-              <div class="panel-title">帮助链接</div>
-              <div class="help-list">
-                <div class="help-block">
-                  <i class="icon-entry" />
-                  入门指南
-                </div>
-                <div class="help-block">
-                  <i class="icon-help" />
-                  在线帮助手册
-                </div>
-                <div class="help-block">
-                  <i class="icon-support" />
-                  联系技术支持
-                </div>
-                <div class="help-block">
-                  <i class="icon-add" />
-                  添加链接
-                </div>
-              </div>
-            </div> -->
-            <div class="help-right">
-              <div class="calendar">
-                <!-- <el-calendar /> -->
-                <el-calendar v-model="value" />
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- 通知公告 -->
-        <div class="panel">
-          <div class="panel-title">通知公告</div>
-          <div class="information-list">
-            <div v-for="(item,index) in list" :key="index" class="information-list-item">
-              <img :src="item.icon" alt="">
-              <div>
-                <p>
-                  {{ item.notice }}
-                </p>
-                <p>{{ item.createTime }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+
+      <!-- 建议反馈对话框 -->
+      <el-dialog
+        title="意见箱"
+        :visible.sync="showSuggestionDialog"
+        width="30%"
+      >
+        <el-form
+          ref="suggestionForm"
+          :model="suggestionForm"
+          :rules="suggestionRules"
+        >
+          <el-form-item prop="content">
+            <el-input
+              v-model="suggestionForm.content"
+              type="textarea"
+              :rows="4"
+              placeholder="请输入您的建议..."
+            />
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="showSuggestionDialog = false">取 消</el-button>
+          <el-button
+            type="primary"
+            :loading="submitting"
+            @click="submitSuggestion"
+          >提 交</el-button>
+        </span>
+      </el-dialog>
     </div>
   </div>
 </template>
 
 <script>
-import CountTo from 'vue-count-to'
-import { mapGetters } from 'vuex'
-import { getHomeData, getMessageList } from '@/api/dashboard'
-import * as echarts from 'echarts/core' // 引入核心包
-import { LineChart, BarChart } from 'echarts/charts' // 引入折线图,柱状图
-echarts.use([
-  LineChart,
-  BarChart
-])
+import * as echarts from 'echarts'
+import { getDashboardData, submitSuggestion } from '@/api/dashboard'
+
 export default {
-  components: {
-    CountTo
-  },
+  name: 'Dashboard',
   data() {
     return {
-      homeData: {}, // 存放首页数据的对象
-      value: new Date(), // 日历
-      list: []// 消息
+      dashboardData: {
+        totalEmployees: 0,
+        newEmployees: 0,
+        departmentCount: 0,
+        averageYears: 0,
+        employeeTrendData: [],
+        departmentDistributionData: [],
+        ageDistributionData: [],
+        educationDistributionData: []
+      },
+      charts: [],
+      showSuggestionDialog: false,
+      submitting: false,
+      suggestionForm: {
+        content: ''
+      },
+      suggestionRules: {
+        content: [
+          { required: true, message: '请输入建议内容', trigger: 'blur' },
+          { min: 10, message: '建议内容不能少于10个字符', trigger: 'blur' }
+        ]
+      }
     }
   },
-  // 计算属性
-  computed: {
-    ...mapGetters(['name', 'avatar', 'company', 'departmentName']) // 映射给了计算属性
+  async mounted() {
+    await this.fetchDashboardData()
+    this.initCharts()
   },
-  watch: {
-    homeData() {
-      console.log(this.homeData)
-      // 设置图表
-      this.social.setOption({
-      //   xAxis: {
-      //     type: 'category',
-      //     boundaryGap: false,
-      //     data: this.homeData.socialInsurance?.xAxis
-      //   },
-      //   yAxis: {
-      //     type: 'value'
-      //   },
-      //   series: [
-      //     {
-      //       data: this.homeData.socialInsurance?.yAxis,
-      //       type: 'line',
-      //       areaStyle: {
-      //         color: '#04c9be' // 填充颜色
-      //       },
-      //       lineStyle: {
-      //         color: '#04c9be' // 线的颜色
-      //       }
-      //     }
-      //   ]
+  beforeDestroy() {
+    this.charts.forEach((chart) => {
+      chart.dispose()
+    })
+  },
+  methods: {
+    handelSuggest() {
+      this.showSuggestionDialog = true
+      console.log('this.showSuggestionDialog', this.showSuggestionDialog)
+    },
+    async fetchDashboardData() {
+      try {
+        const response = await getDashboardData()
+        this.dashboardData = response.data
+      } catch (error) {
+        console.error('获取仪表盘数据失败:', error)
+      }
+    },
+    initCharts() {
+      // 初始化员工入职趋势图
+      const employeeTrend = echarts.init(this.$refs.employeeTrend)
+      employeeTrend.setOption({
         tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow'
-          }
+          trigger: 'axis'
         },
         xAxis: {
           type: 'category',
-          data: this.homeData.socialInsurance?.xAxis
+          data: [
+            '1月',
+            '2月',
+            '3月',
+            '4月',
+            '5月',
+            '6月',
+            '7月',
+            '8月',
+            '9月',
+            '10月',
+            '11月',
+            '12月'
+          ]
         },
         yAxis: {
           type: 'value'
         },
         series: [
           {
-            data: this.homeData.socialInsurance?.yAxis,
+            data: this.dashboardData.employeeTrendData,
+            type: 'line',
+            smooth: true
+          }
+        ]
+      })
+      this.charts.push(employeeTrend)
+
+      // 初始化部门分布图
+      const departmentDistribution = echarts.init(
+        this.$refs.departmentDistribution
+      )
+      departmentDistribution.setOption({
+        tooltip: {
+          trigger: 'item'
+        },
+        series: [
+          {
+            type: 'pie',
+            radius: '60%',
+            data: this.dashboardData.departmentDistributionData
+          }
+        ]
+      })
+      this.charts.push(departmentDistribution)
+
+      // 初始化年龄分布图
+      const ageDistribution = echarts.init(this.$refs.ageDistribution)
+      ageDistribution.setOption({
+        tooltip: {
+          trigger: 'axis'
+        },
+        xAxis: {
+          type: 'category',
+          data: ['20-25岁', '26-30岁', '31-35岁', '36-40岁', '40岁以上']
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            data: this.dashboardData.ageDistributionData,
             type: 'bar'
           }
         ]
       })
-      this.provident.setOption({
+      this.charts.push(ageDistribution)
+
+      // 初始化学历分布图
+      const educationDistribution = echarts.init(
+        this.$refs.educationDistribution
+      )
+      educationDistribution.setOption({
         tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow'
-          }
-        },
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          data: this.homeData.providentFund?.xAxis
-        },
-        yAxis: {
-          type: 'value'
+          trigger: 'item'
         },
         series: [
           {
-            data: this.homeData.providentFund?.yAxis,
-            type: 'line',
-            // areaStyle: {
-            //   color: '#04c9be' // 填充颜色
-            // },
-            lineStyle: {
-              color: '#04c9be' // 线的颜色
-            }
+            type: 'pie',
+            radius: ['40%', '70%'],
+            data: this.dashboardData.educationDistributionData
           }
         ]
       })
-    }
-  },
-  created() {
-    this.getHomeData()
-    this.getMessageList()
-  },
-  mounted() {
-    // 获取展示的数据 设置给图表
-    // 监听homeData的变化
-    this.social = echarts.init(this.$refs.social) // 初始化echart
-    // data中没有声明 不是响应式
-    this.provident = echarts.init(this.$refs.provident)
-  },
-  methods: {
-    async getHomeData() {
-      this.homeData = await getHomeData()
+      this.charts.push(educationDistribution)
     },
-    async getMessageList() {
-      this.list = await getMessageList()
+    async submitSuggestion() {
+      try {
+        const valid = await this.$refs.suggestionForm.validate()
+        if (valid) {
+          this.submitting = true
+          await submitSuggestion(this.suggestionForm)
+          this.$message({
+            message: '感谢您的建议！我们会认真考虑。',
+            type: 'success'
+          })
+          this.suggestionForm.content = ''
+          this.showSuggestionDialog = false
+        }
+      } catch (error) {
+        this.$message.error('提交建议失败，请稍后重试')
+      } finally {
+        this.submitting = false
+      }
     }
   }
 }
 </script>
 
-<style scoped lang="scss">
-.dashboard {
-  background: #f5f6f8;
-  width: 100%;
-  min-height: calc(100vh - 80px);
+<style lang="scss" scoped>
+.dashboard-container {
+  padding: 20px;
+  position: relative;
 
-  ::v-deep .el-calendar-day {
-  height:  40px;
- }
-//  ::v-deep .el-calendar-table__row td,::v-deep .el-calendar-table tr td:first-child, ::v-deep .el-calendar-table__row td.prev{
-//   border:none;
-//  }
-
-.date-content {
-  height: 40px;
-  text-align: center;
-  line-height: 40px;
-  font-size: 14px;
-}
-.date-content .rest {
-  color: #fff;
-  border-radius: 50%;
-  background: rgb(250, 124, 77);
-  width: 20px;
-  height: 20px;
-  line-height: 20px;
-  display: inline-block;
-  font-size: 12px;
-  margin-left: 10px;
-}
-.date-content .text{
-  width: 20px;
-  height: 20px;
-  line-height: 20px;
- display: inline-block;
-
-}
-::v-deep .el-calendar-table td.is-selected .text{
-   background: #409eff;
-   color: #fff;
-   border-radius: 50%;
- }
-//  ::v-deep .el-calendar__header {
-//    display: none
-//  }
-  .container {
+  .suggestion-box {
+    position: fixed;
+    right: 40px;
+    bottom: 40px;
+    width: 50px;
+    height: 50px;
+    background: #409eff;
+    border-radius: 50%;
     display: flex;
-    .right {
-      width: 40%;
-      .panel {
-        margin-left: 8px;
-      }
-      :nth-child(1) {
-        margin-top: 0;
-      }
-    }
-    .left {
-      flex: 1;
-      :nth-child(1) {
-        margin-top: 0;
-      }
-    }
-    .panel {
-      background-color: #fff;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
 
-      margin-top: 8px;
-      padding: 20px;
-      .panel-title {
-        font-size: 16px;
-        color: #383c4e;
-        font-weight: 500;
-      }
-      // 用户信息样式
-      .user-info {
-        display: flex;
-        .avatar {
-          width: 48px;
-          height: 48px;
-          border-radius: 12px;
-          background-color: #d9d9d9;
-          line-height: 48px;
-          text-align: center;
-        }
-         .username {
-           width: 30px;
-           height: 30px;
-           text-align: center;
-           line-height: 30px;
-           border-radius: 50%;
-           background: #04c9be;
-           color: #fff;
-           margin-right: 4px;
-         }
-        .company-info {
-          margin-left: 10px;
-          height: 48px;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-around;
-          .title {
-            color: #383c4e;
-            font-weight: 500;
-            font-size: 16px;
-            font-family: PingFang SC, PingFang SC-Medium;
-            span {
-              font-size: 12px;
-              background: #f5f6f8;
-              text-align: center;
-              padding: 2px 8px;
-              border-radius: 2px;
-              color: #697086;
-            }
-          }
-          .depart {
-            font-size: 14px;
-            color: #697086;
-            font-weight: 400;
-          }
-        }
-      }
-      // 代办样式
-      .todo-list {
-        margin-top: 10px;
-        display: flex;
-        flex-wrap: wrap;
-        .todo-item {
-          width: 18%;
-          height: 90px;
-          display: flex;
-          flex-direction: column;
-          padding: 10px;
-          justify-content: space-around;
-          :nth-child(1) {
-            color: #697086;
-            font-size: 14px;
-          }
-          :nth-child(2) {
-            color: #383c4e;
-            font-size: 30px;
-            font-weight: 500;
-          }
-        }
-      }
-      // 快捷入口
-      .quick-entry {
-        margin-top: 16px;
-        display: flex;
-        .entry-item {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          margin-left: 60px;
-          &:nth-child(1) {
-            margin-left: 0px;
-          }
-          .entry-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: #f5f6f8;
-            background-size: cover;
-            &.approval {
-              background-image: url('~@/assets/common/approval.png');
-            }
-             &.social {
-              background-image: url('~@/assets/common/social.png');
-            }
-             &.salary {
-              background-image: url('~@/assets/common/salary.png');
-            }
-            &.role {
-              background-image: url('~@/assets/common/role.png');
-            }
-             &.bpm {
-              background-image: url('~@/assets/common/bpm.png');
-            }
-          }
-          span {
-            color: #697086;
-            font-size: 14px;
-            margin-top: 8px;
-          }
-        }
-      }
-      // 图表数据
-      .chart-container {
-        display: flex;
-        .chart-info {
-         width: 240px;
-          margin-top: 10px;
-          .info-main {
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            :nth-child(1) {
-              font-size: 14px;
-              color: #697086;
-            }
-            :nth-child(2) {
-              margin-top: 10px;
-              font-size: 30px;
-              color: #04c9be;
-              font-weight: 500;
-            }
-          }
-          .info-list {
-            background: #f5f6f8;
-            border-radius: 4px;
-            padding: 12px 15px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            .info-list-item {
-              width: 50%;
-              margin-top: 10px;
-              display: flex;
-              flex-direction: column;
+    i {
+      font-size: 24px;
+      color: #fff;
+    }
 
-              :nth-child(1) {
-                font-size: 14px;
-                color: #697086;
-              }
-              :nth-child(2) {
-                margin-top: 10px;
-                font-size: 30px;
-                color: #383c4e;
-                font-weight: 500;
-              }
-            }
-          }
-        }
-        .chart {
-          flex:1
-        }
-      }
-      // 帮助链接
-      .help {
-        display: flex;
-        .help-left {
-          width: 40%;
-        }
-        .help-right {
-          flex: 1;
-        }
-        .help-list {
-          .help-block {
-            background: #f5f6f8;
-            border-radius: 4px;
-            width: 264px;
-            height: 54px;
-            padding: 17px 10px;
-            font-size: 14px;
-            color: #697086;
-            margin-top: 10px;
-            i {
-              width: 14px;
-              height: 14px;
-              display: inline-block;
-              background-size: cover;
-              vertical-align: middle;
-            }
-            i.icon-help {
-              background-image: url("~@/assets/common/help.png");
-            }
-             i.icon-support {
-              background-image: url("~@/assets/common/support.png");
-            }
-             i.icon-add {
-              background-image: url("~@/assets/common/add.png");
-            }
-             i.icon-entry {
-              background-image: url("~@/assets/common/entry.png");
-            }
-          }
-        }
-      }
-      // 通知公告
-      .information-list {
-        margin-top: 20px;
-        .information-list-item {
-          display: flex;
-          align-items: center;
-          margin:15px 0;
-          img {
-            width: 40px;
-            height: 40px;
-            border: 50%;
-          }
-         .col {
-           color: #8a97f8;
-         }
-         div :nth-child(2) {
-          color: #697086;
-          font-size: 14px;
-         }
-        }
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  .data-card {
+    display: flex;
+    align-items: center;
+
+    .icon-wrapper {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+
+      i {
+        font-size: 40px;
+        color: #fff;
       }
     }
+
+    .data-content {
+      .data-title {
+        font-size: 14px;
+        color: #909399;
+        margin-bottom: 10px;
+      }
+
+      .data-number {
+        font-size: 24px;
+        font-weight: bold;
+        color: #303133;
+      }
+    }
+  }
+
+  .bg-blue {
+    background-color: #409eff;
+  }
+
+  .bg-green {
+    background-color: #67c23a;
+  }
+
+  .bg-orange {
+    background-color: #e6a23c;
+  }
+
+  .bg-red {
+    background-color: #f56c6c;
   }
 }
 </style>

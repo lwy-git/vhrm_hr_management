@@ -1,555 +1,361 @@
 <template>
-  <div v-loading="loading" class="dashboard-container">
+  <div class="container">
     <div class="app-container">
-      <!-- 工具栏 -->
-
-      <el-card class="hr-block">
-        <el-form ref="formData" :model="formData" label-width="120px" class="formInfo">
-          <el-form-item label="部门:">
-            <el-checkbox-group v-model="formData.deptID">
-              <el-checkbox
-                v-for="item in departments"
-                :key="item.id"
-                :label="item.name"
-              >
-                {{ item.name }}
-              </el-checkbox>
-            </el-checkbox-group>
+      <!-- 搜索栏 -->
+      <div class="search-bar">
+        <el-form :inline="true" :model="queryParams" class="search-form">
+          <el-form-item>
+            <el-input
+              v-model="queryParams.keyword"
+              placeholder="请输入员工姓名搜索"
+              prefix-icon="el-icon-search"
+              clearable
+              style="width: 220px"
+              size="small"
+              @keyup.enter.native="handleSearch"
+            />
           </el-form-item>
-          <el-form-item label="考勤状态：">
-            <el-radio-group v-model="formData.stateID">
-              <el-radio
-                v-for="item in stateData.holidayType"
-                :key="item.id"
-                :label="item.value"
+          <el-form-item>
+            <el-select
+              v-model="queryParams.status"
+              placeholder="请选择考勤状态"
+              clearable
+              style="width: 160px"
+              size="small"
+              @change="getAttendanceList"
+            >
+              <el-option
+                v-for="item in statusOptions"
+                :key="item.value"
+                :label="item.label"
                 :value="item.value"
-              >
-                {{ item.value }}
-              </el-radio>
-            </el-radio-group>
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              type="primary"
+              icon="el-icon-search"
+              size="small"
+              @click="handleSearch"
+            >搜索</el-button>
+            <el-button
+              icon="el-icon-refresh"
+              size="small"
+              @click="handleReset"
+            >重置</el-button>
           </el-form-item>
         </el-form>
-      </el-card>
-      <!-- 考勤数据 -->
-      <el-card class="hr-block">
-        <!-- 考勤列表 -->
-        <div style="width:100%;position: relative;overflow-x: auto; overflow-y: hidden;">
-          <div style="width: 3000px;">
-            <table border="0" align="center" cellpadding="0" cellspacing="0" class="tableInfo">
-              <tr>
-                <th width="50">序号</th>
-                <th width="100">姓名</th>
-                <th width="100">工号</th>
-                <th width="200">部门</th>
-                <th width="100">手机</th>
-                <th v-for="(it, ind) in monthOfReport" :key="ind" width="110">{{ attendInfo.month }}/{{ ind + 1 }}</th>
-              </tr>
-              <tr v-for="(item, index) in list" :key="item.id">
-                <td width="50">{{ index }}</td>
-                <td width="100">{{ item.username }}</td>
-                <td width="100">{{ item.workNumber }}</td>
-                <td width="200">{{ item.departmentName }}</td>
-                <td width="100">{{ item.mobile }}</td>
-                <td
-                  v-for="(it,ind) in item.attendanceRecord"
-                  :key="ind"
-                  width="110"
-                  @click="showChangeDialog(item,ind,it)"
-                >
-                  <span v-if="it.adtStatu===1">√</span>
-                  <span v-if="it.adtStatu===2">旷工</span>
-                  <span v-if="it.adtStatu===3">迟到</span>
-                  <span v-if="it.adtStatu===4">早退</span>
-                  <span v-if="it.adtStatu===5">外出</span>
-                  <span v-if="it.adtStatu===6">出差</span>
-                  <span v-if="it.adtStatu===7">年假</span>
-                  <span v-if="it.adtStatu===8">事假</span>
-                  <span v-if="it.adtStatu===9">病假</span>
-                  <span v-if="it.adtStatu===10">婚假</span>
-                  <span v-if="it.adtStatu===11">丧假</span>
-                  <span v-if="it.adtStatu===12">产假</span>
-                  <span v-if="it.adtStatu===13">奖励产假</span>
-                  <span v-if="it.adtStatu===14">陪产假</span>
-                  <span v-if="it.adtStatu===15">探亲假</span>
-                  <span v-if="it.adtStatu===16">工伤假</span>
-                  <span v-if="it.adtStatu===17">调休</span>
-                  <span v-if="it.adtStatu===18">产检假</span>
-                  <span v-if="it.adtStatu===19">流产假2</span>
-                  <span v-if="it.adtStatu===20">长期病假</span>
-                  <span v-if="it.adtStatu===21">测试架</span>
-                  <span v-if="it.adtStatu===22">补签</span>
-                </td>
-              </tr>
-            </table>
-          </div>
+      </div>
+      <div class="right">
+        <el-row class="operate-tools" type="flex" justify="end">
+          <el-button
+            size="mini"
+            type="primary"
+            @click="handleAdd"
+          >添加考勤</el-button>
+          <el-button size="mini" @click="handleExport">导出考勤</el-button>
+        </el-row>
 
-        </div>
-        <el-dialog
-          :visible.sync="centerDialogVisible"
-          width="30%"
-          center
+        <el-table
+          ref="attendanceTable"
+          :data="attendanceList"
+          border
+          style="width: 100%"
         >
-          <span slot="title" style="color:#fff;">{{ attendInfo.name }} {{ attendInfo.month }}/{{ attendInfo.getDate }}（实际工作日考勤方案）</span>
-          <div class="attenInfo">
-            <p class="colRed">注：统计考勤时，异常状态优先正常状态</p>
-            <p class="check">
-              <el-radio-group v-model="modifyData.adtStatu">
-                <el-radio
-                  v-for="item in stateData.vacationtype"
-                  :key="item.id"
-                  :label="item.id"
-                  :value="item.name"
-                >{{ item.name }}</el-radio>
-              </el-radio-group></p>
-          </div>
-          <span slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="btnOK">确定</el-button>
-            <el-button @click="centerDialogVisible = false">取消</el-button>
-          </span>
-        </el-dialog>
-        <!-- 分页组件 -->
-        <el-row type="flex" align="middle" justify="center" style="height: 60px">
+          <el-table-column prop="employeeName" label="员工姓名" />
+          <el-table-column prop="attendanceDate" label="考勤日期" sortable />
+          <el-table-column prop="checkInTime" label="签到时间" sortable />
+          <el-table-column prop="checkOutTime" label="签退时间" sortable />
+          <el-table-column prop="status" label="考勤状态">
+            <template v-slot="{ row }">
+              <el-tag :type="getStatusType(row.status)">
+                {{ getStatusText(row.status) }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="remark" label="备注" />
+          <el-table-column label="操作" width="200px" align="center">
+            <template v-slot="{ row }">
+              <el-button
+                size="mini"
+                type="text"
+                @click="handleEdit(row)"
+              >编辑</el-button>
+              <el-button
+                size="mini"
+                type="text"
+                @click="handleDelete(row.id)"
+              >删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <el-row type="flex" style="height: 60px" align="middle" justify="end">
+          <span class="total-count">共 {{ total }} 条</span>
           <el-pagination
-            :page-size="page.pagesize"
-            :current-page="page.page"
             layout="prev, pager, next"
-            :total="page.total"
-            @current-change="pageChange"
+            :total="total"
+            :current-page="queryParams.page"
+            :page-size="queryParams.pagesize"
+            background
+            @current-change="changePage"
           />
         </el-row>
-      </el-card>
-    </div>
-    <el-card>
-      <!-- 提醒组件 -->
+      </div>
+
+      <!-- 添加/编辑考勤弹窗 -->
       <el-dialog
-        title="提醒"
-        :visible.sync="tipsDialogVisible"
-        width="280px"
-        center
+        :title="dialogTitle"
+        :visible.sync="dialogVisible"
+        width="500px"
       >
-        <div class="attenInfo">
-          <p>系统将通过邮件与短信的形式，对全体员工中存在旷工的考勤进行提醒，该提醒每月仅可发送 1 次。</p>
+        <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+          <el-form-item label="员工姓名" prop="employeeName">
+            <el-input v-model="form.employeeName" />
+          </el-form-item>
+          <el-form-item label="考勤日期" prop="attendanceDate">
+            <el-date-picker
+              v-model="form.attendanceDate"
+              type="date"
+              placeholder="选择日期"
+            />
+          </el-form-item>
+          <el-form-item label="签到时间" prop="checkInTime">
+            <el-time-picker v-model="form.checkInTime" placeholder="选择时间" />
+          </el-form-item>
+          <el-form-item label="签退时间" prop="checkOutTime">
+            <el-time-picker
+              v-model="form.checkOutTime"
+              placeholder="选择时间"
+            />
+          </el-form-item>
+          <el-form-item label="考勤状态" prop="status">
+            <el-select v-model="form.status">
+              <el-option
+                v-for="item in statusOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="备注" prop="remark">
+            <el-input v-model="form.remark" type="textarea" />
+          </el-form-item>
+        </el-form>
+        <div slot="footer">
+          <el-button @click="dialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="submitForm">确 定</el-button>
         </div>
-        <span slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="handleSub">我知道了</el-button>
-          <el-button @click="centerDialogVisible = false">取消</el-button>
-        </span>
       </el-dialog>
-      <!-- 设置组件 -->
-      <attendance-set ref="set" @handleCloseModal="handleCloseModal" /></el-card></div>
+    </div>
+  </div>
 </template>
 
 <script>
-import { getAttendancesList } from '@/api/attendance'
-import AttendanceSet from './components/attendance-set'
-import { getDepartment } from '@/api/department'
+import {
+  getAttendanceList,
+  addAttendance,
+  updateAttendance,
+  deleteAttendance
+} from '@/api/attendance'
+import { parseTime } from '@/utils'
+
 export default {
-  name: 'Attendances',
-  components: { AttendanceSet },
+  name: 'Attendance',
   data() {
     return {
-      list: [],
-      selectData: [],
-      stateData: {
-        // 假期类型
-        holidayType: [{
-          id: '1',
-          value: '正常',
-          isEnable: false
-        },
-        {
-          id: '2',
-          value: '旷工',
-          isEnable: false
-        },
-        {
-          id: '3',
-          value: '事假',
-          isEnable: false
-        },
-        {
-          id: '4',
-          value: '调休',
-          isEnable: false
-        },
-        {
-          id: '5',
-          value: '迟到',
-          isEnable: false
-        },
-        {
-          id: '6',
-          value: '早退',
-          isEnable: false
-        }
+      queryParams: {
+        keyword: '',
+        status: '',
+        page: 1,
+        pagesize: 10
+      },
+      total: 0,
+      attendanceList: [],
+      dialogVisible: false,
+      dialogTitle: '',
+      // 考勤状态枚举
+      attendanceStatus: {
+        NORMAL: 1, // 正常
+        LATE: 2, // 迟到
+        EARLY: 3, // 早退
+        ABSENT: 4, // 旷工
+        OUTSIDE: 5, // 外勤
+        LEAVE: 6 // 请假
+      },
+      statusOptions: [
+        { value: 1, label: '正常' },
+        { value: 2, label: '迟到' },
+        { value: 3, label: '早退' },
+        { value: 4, label: '旷工' },
+        { value: 5, label: '外勤' },
+        { value: 6, label: '请假' }
+      ],
+      form: {
+        id: null,
+        employeeName: '',
+        attendanceDate: '',
+        checkInTime: '',
+        checkOutTime: '',
+        status: 1,
+        remark: ''
+      },
+      rules: {
+        employeeName: [
+          { required: true, message: '请输入员工姓名', trigger: 'blur' }
         ],
-        vacationtype: [{
-          id: '1',
-          name: '正常'
-        }, {
-          id: '2',
-          name: '旷工'
-        }, {
-          id: '3',
-          name: '迟到'
-        }, {
-          id: '4',
-          name: '早退'
-        }, {
-          id: '5',
-          name: '外出'
-        }, {
-          id: '6',
-          name: '出差'
-        }, {
-          id: '7',
-          name: '年假'
-        }, {
-          id: '8',
-          name: '事假'
-        }, {
-          id: '9',
-          name: '病假'
-        }, {
-          id: '10',
-          name: '婚假'
-        }, {
-          id: '11',
-          name: '丧假'
-        }, {
-          id: '12',
-          name: '产假'
-        }, {
-          id: '13',
-          name: '奖励产假'
-        }, {
-          id: '14',
-          name: '陪产假'
-        }, {
-          id: '15',
-          name: '探亲假'
-        }, {
-          id: '16',
-          name: '工伤假'
-        }, {
-          id: '17',
-          name: '调休'
-        }, {
-          id: '18',
-          name: '产检假'
-        }, {
-          id: '19',
-          name: '流产假'
-        }, {
-          id: '20',
-          name: '长期病假'
-        }, {
-          id: '21',
-          name: '测试假'
-        }, {
-          id: '22',
-          name: '补签'
-        }
-
+        attendanceDate: [
+          { required: true, message: '请选择考勤日期', trigger: 'change' }
         ],
-        type: [{
-          leaveType: '60000',
-          name: '年假',
-          isEnable: false
-        },
-        {
-          leaveType: '60100',
-          name: '事假',
-          isEnable: false
-        },
-        {
-          leaveType: '60200',
-          name: '病假',
-          isEnable: false
-        },
-        {
-          leaveType: '60300',
-          name: '婚假',
-          isEnable: false
-        },
-        {
-          leaveType: '60400',
-          name: '丧假',
-          isEnable: false
-        },
-        {
-          leaveType: '60500',
-          name: '产假',
-          isEnable: false
-        },
-        {
-          leaveType: '60600',
-          name: '奖励产假',
-          isEnable: false
-        },
-        {
-          leaveType: '60700',
-          name: '陪产假',
-          isEnable: false
-        },
-        {
-          leaveType: '60800',
-          name: '探亲假',
-          isEnable: false
-        },
-        {
-          leaveType: '60900',
-          name: '工伤假',
-          isEnable: false
-        },
-        {
-          leaveType: '61000',
-          name: '调休假',
-          isEnable: false
-        },
-        {
-          leaveType: '61100',
-          name: '产检假',
-          isEnable: false
-        },
-        {
-          leaveType: '61200',
-          name: '流产假',
-          isEnable: false
-        },
-        {
-          leaveType: '61300',
-          name: '长期病假',
-          isEnable: false
-        },
-        {
-          leaveType: '61400',
-          name: '测试假',
-          isEnable: false
-        }
+        checkInTime: [
+          { required: true, message: '请选择签到时间', trigger: 'change' }
         ],
-        departmentType: [{
-          dedTypeCode: '51000',
-          name: '迟到扣款',
-          isEnable: false,
-          departmentId: '',
-          periodLowerLimit: '30', // 时间段下限
-          periodUpperLimit: '30', // 时间段上限
-          timesLowerLimit: '2', // 次数下限
-          timesUpperLimit: '2', // 次数上限
-          dedAmonutLowerLimit: '30', // 扣款金额下限
-          dedAmonutUpperLimit: '0', // 扣款金额上限
-          absenceDays: '0.5', // 旷工天数
-          fineSalaryMultiples: '2', // 罚款工资倍数
-          absenceTimesUpperLimt: '0' // 旷工次数上限
-        },
-        {
-          dedTypeCode: '52000',
-          name: '早退扣款',
-          isEnable: false,
-          departmentId: '',
-          periodLowerLimit: '30', // 时间段下限
-          periodUpperLimit: '30', // 时间段上限
-          timesLowerLimit: '2', // 次数下限
-          timesUpperLimit: '2', // 次数上限
-          dedAmonutLowerLimit: '30', // 扣款金额下限
-          dedAmonutUpperLimit: '0', // 扣款金额上限
-          absenceDays: '0.5', // 旷工天数
-          fineSalaryMultiples: '2', // 罚款工资倍数
-          absenceTimesUpperLimt: '0' // 旷工次数上限
-        },
-        {
-          dedTypeCode: '53000',
-          name: '旷工扣款',
-          isEnable: false,
-          departmentId: '',
-          periodLowerLimit: '30', // 时间段下限
-          periodUpperLimit: '30', // 时间段上限
-          timesLowerLimit: '2', // 次数下限
-          timesUpperLimit: '2', // 次数上限
-          dedAmonutLowerLimit: '30', // 扣款金额下限
-          dedAmonutUpperLimit: '0', // 扣款金额上限
-          absenceDays: '0.5', // 旷工天数
-          fineSalaryMultiples: '2', // 罚款工资倍数
-          absenceTimesUpperLimt: '0' // 旷工次数上限
-        }
+        checkOutTime: [
+          { required: true, message: '请选择签退时间', trigger: 'change' }
         ],
-        overtimeType: [{
-          // id: '1',
-          departmentId: '', // 部门ID
-          rule: '工作日可申请加班', // 规则内容
-          ruleStartTime: '', // 规则生效每日开始时间
-          ruleEndTime: '', // 规则生效每日结束时间
-          isTimeOff: false, // 是否调休
-          isEnable: false // 是否可用
-        },
-        {
-          // id: '2',
-          departmentId: '', // 部门ID
-          rule: '休息日可申请加班', // 规则内容
-          ruleStartTime: '', // 规则生效每日开始时间
-          ruleEndTime: '', // 规则生效每日结束时间
-          isTimeOff: false, // 是否调休
-          isEnable: false // 是否可用
-        },
-        {
-          // id: '3',
-          departmentId: '', // 部门ID
-          rule: '法定节假日可申请加班', // 规则内容
-          ruleStartTime: '', // 规则生效每日开始时间
-          ruleEndTime: '', // 规则生效每日结束时间
-          isTimeOff: false, // 是否调休
-          isEnable: false // 是否可用
-        }
+        status: [
+          { required: true, message: '请选择考勤状态', trigger: 'change' }
         ]
-      },
-      departments: [],
-      total: 100,
-      attendanceRecord: '',
-      monthOfReport: '',
-      centerDialogVisible: false,
-      tipsDialogVisible: false,
-      month: '',
-      yearMonth: '',
-      loading: false,
-      attendInfo: {
-        month: '',
-        getDate: '',
-        getInfo: '',
-        name: '',
-        counts: '',
-        tobeTaskCount: ''
-      },
-      formData: {
-        page: 1,
-        pagesize: 10,
-        keyword: this.keyword,
-        deptID: [], // 性别
-        stateID: ''
-      },
-      page: {
-        page: 1,
-        pagesize: 10,
-        total: 0
-      },
-      modifyData: {
-        userId: '',
-        day: '',
-        adtStatu: ''
       }
     }
   },
-  // 创建完毕状态
   created() {
-    this.getAttendancesList() // 获取考勤列表
-    this.getDepartment() // 获取考勤列表
+    this.getAttendanceList()
   },
   methods: {
-    // 暂时不处理
-    handleSub() {
-      this.tipsDialogVisible = false
-      this.$message.success('提醒成功')
-    },
-    handleTip() {
-      this.tipsDialogVisible = true
-    },
-    // 设置
-    handleSet() {
-      this.$refs.set.dialogFormV()
-    },
-    // 弹框关闭
-    handleCloseModal() {
-      this.$refs.set.dialogFormH()
-    },
-    // 获取组织列表
-    async getDepartment() {
-      this.departments = await getDepartment()
-    },
-
-    // 初始化数据
-    async getAttendancesList() {
-      this.loading = true
-      const { data, monthOfReport, tobeTaskCount } = await getAttendancesList({ ...this.page })
-      this.list = data.rows // 当前记录
-      this.page.total = data.total // 总条数
-      this.attendInfo.counts = data.total
-      this.attendInfo.month = monthOfReport
-      this.attendInfo.tobeTaskCount = tobeTaskCount
-
-      var date = new Date()
-      var year = date.getFullYear()
-      const month = monthOfReport
-      var d = new Date(year, month, 0) // 获取月份
-      this.monthOfReport = d.getDate() // 获取日期
-      this.yearMonth = year + ('' + month < 10 ? '0' + month : month)
-      this.month = monthOfReport
-      this.loading = false
-    },
-    // 确定修改
-    async  btnOK() {
-      // await updateAttendance(this.modifyData)
-      this.$message.success('更新成功')
-      this.centerDialogVisible = false
-      this.getAttendancesList() // 成功之后 重新拉取数据
-    },
-    // 页码改变
-    pageChange(page) {
-      this.page.page = page
-      this.getAttendancesList() // 获取数据
-    },
-    showChangeDialog(item, id, it) {
-      this.modifyData.userId = item.id
-      this.modifyData.day = it.day
-      this.modifyData.departmentId = item.departmentId
-      this.modifyData.adtStatu = it.adtStatu + '' // 数字转成字符串
-
-      if (it.adtStatu !== '') {
-        this.attendInfo.getDate = parseInt(id + 1)
-        this.attendInfo.getInfo = it.adtStatu
-        this.attendInfo.name = item.name
-        this.centerDialogVisible = true
+    // 获取考勤列表
+    async getAttendanceList() {
+      try {
+        const { data } = await getAttendanceList(this.queryParams)
+        this.attendanceList = data.rows
+        this.total = data.total
+      } catch (error) {
+        console.error('获取考勤列表失败:', error)
       }
+    },
+    // 获取状态文本
+    getStatusText(status) {
+      const statusItem = this.statusOptions.find(
+        (item) => item.value === status
+      )
+      return statusItem ? statusItem.label : ''
+    },
+    // 搜索
+    handleSearch() {
+      this.queryParams.page = 1
+      this.getAttendanceList()
+    },
+    // 重置
+    handleReset() {
+      this.queryParams = {
+        keyword: '',
+        status: '',
+        page: 1,
+        pagesize: 10
+      }
+      this.getAttendanceList()
+    },
+    // 获取状态对应的类型
+    getStatusType(status) {
+      const typeMap = {
+        [this.attendanceStatus.NORMAL]: 'success',
+        [this.attendanceStatus.LATE]: 'warning',
+        [this.attendanceStatus.EARLY]: 'warning',
+        [this.attendanceStatus.ABSENT]: 'danger',
+        [this.attendanceStatus.OUTSIDE]: 'info',
+        [this.attendanceStatus.LEAVE]: 'info'
+      }
+      return typeMap[status] || ''
+    },
+    // 切换页码
+    changePage(page) {
+      this.queryParams.page = page
+      this.getAttendanceList()
+    },
+    // 添加考勤
+    handleAdd() {
+      this.dialogTitle = '添加考勤'
+      this.form = {
+        id: null,
+        employeeName: '',
+        attendanceDate: '',
+        checkInTime: '',
+        checkOutTime: '',
+        status: this.attendanceStatus.NORMAL,
+        remark: ''
+      }
+      this.dialogVisible = true
+    },
+    // 编辑考勤
+    handleEdit(row) {
+      this.dialogTitle = '编辑考勤'
+      this.form = { ...row }
+      this.dialogVisible = true
+    },
+    // 删除考勤
+    handleDelete(id) {
+      this.$confirm('确认删除该考勤记录吗？', '提示', {
+        type: 'warning'
+      })
+        .then(async() => {
+          try {
+            await deleteAttendance(id)
+            this.$message.success('删除成功')
+            this.getAttendanceList()
+          } catch (error) {
+            console.error('删除考勤失败:', error)
+          }
+        })
+        .catch(() => {})
+    },
+    // 导出考勤
+    handleExport() {
+      const params = { ...this.queryParams }
+      window.location.href =
+        process.env.VUE_APP_BASE_API +
+        '/attendance/export?' +
+        this.queryString(params)
+    },
+    // 提交表单
+    submitForm() {
+      this.$refs.form.validate(async(valid) => {
+        if (valid) {
+          try {
+            const formData = {
+              ...this.form,
+              attendanceDate: parseTime(
+                this.form.attendanceDate,
+                '{y}-{m}-{d}'
+              ),
+              checkInTime: parseTime(this.form.checkInTime, '{h}:{i}:{s}'),
+              checkOutTime: parseTime(this.form.checkOutTime, '{h}:{i}:{s}')
+            }
+
+            if (this.form.id) {
+              await updateAttendance(formData)
+            } else {
+              await addAttendance(formData)
+            }
+
+            this.$message.success(this.form.id ? '编辑成功' : '添加成功')
+            this.dialogVisible = false
+            this.getAttendanceList()
+          } catch (error) {
+            console.error('保存考勤失败:', error)
+          }
+        }
+      })
+    },
+    // 将对象转为查询字符串
+    queryString(obj) {
+      return Object.keys(obj)
+        .map(
+          (key) => `${encodeURIComponent(key)}=${encodeURIComponent(obj[key])}`
+        )
+        .join('&')
     }
   }
 }
 </script>
-
-<style rel="stylesheet/scss" lang="scss" scoped>
-  .tableInfo {
-    line-height: 36px;
-    border: solid 1px #ebeef5;
-    border-right: 0 none;
-    border-bottom: 0 none;
-    tr {
-      th {
-        height: 50px;
-        text-align: center;
-        border-right: solid 1px #ebeef5;
-        border-bottom: solid 1px #ebeef5;
-        border-bottom: 2px solid #e8e8e8;
-        background: #fafafa;
-        min-width:  100px;
-      }
-      td {
-        height: 36px;
-        text-align: center;
-        border-right: solid 1px #ebeef5;
-        border-bottom: solid 1px #ebeef5;
-      }
-    }
-  }
-
-.attenInfo {
-  p {
-    &.check {
-      padding: 20px 0 0;
-    }
-    .el-radio {
-        display: inline-block;
-        width: 60px;
-        padding: 5px 0;
-
-    }
-  }
-}
-</style>
