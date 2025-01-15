@@ -8,7 +8,6 @@
             <el-input
               v-model="queryParams.keyword"
               placeholder="请输入员工姓名搜索"
-              prefix-icon="el-icon-search"
               clearable
               style="width: 220px"
               size="small"
@@ -22,7 +21,7 @@
               clearable
               style="width: 160px"
               size="small"
-              @change="getAttendanceList"
+              @keyup.enter.native="handleSearch"
             >
               <el-option
                 v-for="item in statusOptions"
@@ -35,12 +34,10 @@
           <el-form-item>
             <el-button
               type="primary"
-              icon="el-icon-search"
               size="small"
               @click="handleSearch"
             >搜索</el-button>
             <el-button
-              icon="el-icon-refresh"
               size="small"
               @click="handleReset"
             >重置</el-button>
@@ -60,13 +57,12 @@
         <el-table
           ref="attendanceTable"
           :data="attendanceList"
-          border
           style="width: 100%"
         >
           <el-table-column prop="employeeName" label="员工姓名" />
           <el-table-column prop="attendanceDate" label="考勤日期" sortable />
-          <el-table-column prop="checkInTime" label="签到时间" sortable />
-          <el-table-column prop="checkOutTime" label="签退时间" sortable />
+          <el-table-column prop="checkinTime" label="签到时间" sortable />
+          <el-table-column prop="checkoutTime" label="签退时间" sortable />
           <el-table-column prop="status" label="考勤状态">
             <template v-slot="{ row }">
               <el-tag :type="getStatusType(row.status)">
@@ -111,8 +107,24 @@
         width="500px"
       >
         <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-          <el-form-item label="员工姓名" prop="employeeName">
-            <el-input v-model="form.employeeName" />
+          <el-form-item label="员工" prop="employeeId">
+            <el-select
+              v-model="form.employeeId"
+              placeholder="请选择员工"
+              :disabled="isEmployeeDisabled"
+              style="width: 61%"
+              @change="handleEmployeeChange"
+            >
+              <el-option
+                v-for="item in employeeList"
+                :key="item.id"
+                :label="item.username"
+                :value="item.id"
+              >
+                <span>{{ item.username }}</span>
+                <span style="float: right; color: #8492a6; font-size: 13px">{{ item.department }}</span>
+              </el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="考勤日期" prop="attendanceDate">
             <el-date-picker
@@ -122,16 +134,16 @@
               value-format="yyyy-MM-dd"
             />
           </el-form-item>
-          <el-form-item label="签到时间" prop="checkInTime">
+          <el-form-item label="签到时间" prop="checkinTime">
             <el-time-picker
-              v-model="form.checkInTime"
+              v-model="form.checkinTime"
               placeholder="选择时间"
               value-format="HH:mm:ss"
             />
           </el-form-item>
-          <el-form-item label="签退时间" prop="checkOutTime">
+          <el-form-item label="签退时间" prop="checkoutTime">
             <el-time-picker
-              v-model="form.checkOutTime"
+              v-model="form.checkoutTime"
               placeholder="选择时间"
               value-format="HH:mm:ss"
             />
@@ -164,9 +176,11 @@ import {
   getAttendanceList,
   addAttendance,
   updateAttendance,
+  getAttendanceDetail,
   deleteAttendance
 } from '@/api/attendance'
-import { parseTime } from '@/utils'
+import { getEmployeeList } from '@/api/employee'
+// import { parseTime } from '@/utils'
 
 export default {
   name: 'Attendance',
@@ -178,98 +192,17 @@ export default {
         page: 1,
         pagesize: 10
       },
-      total: 10,
+      total: 0,
       attendanceList: [
-        {
-          id: 1,
-          employeeName: '张三',
-          attendanceDate: '2024-01-10',
-          checkInTime: '09:00:00',
-          checkOutTime: '18:00:00',
-          status: 1,
-          remark: '正常出勤'
-        },
-        {
-          id: 2,
-          employeeName: '李四',
-          attendanceDate: '2024-01-10',
-          checkInTime: '09:30:00',
-          checkOutTime: '18:00:00',
-          status: 2,
-          remark: '迟到30分钟'
-        },
-        {
-          id: 3,
-          employeeName: '王五',
-          attendanceDate: '2024-01-10',
-          checkInTime: '09:00:00',
-          checkOutTime: '17:00:00',
-          status: 3,
-          remark: '提前1小时离开'
-        },
-        {
-          id: 4,
-          employeeName: '赵六',
-          attendanceDate: '2024-01-10',
-          checkInTime: '',
-          checkOutTime: '',
-          status: 4,
-          remark: '全天未打卡'
-        },
-        {
-          id: 5,
-          employeeName: '钱七',
-          attendanceDate: '2024-01-10',
-          checkInTime: '09:00:00',
-          checkOutTime: '18:00:00',
-          status: 5,
-          remark: '外出客户拜访'
-        },
-        {
-          id: 6,
-          employeeName: '孙八',
-          attendanceDate: '2024-01-10',
-          checkInTime: '',
-          checkOutTime: '',
-          status: 6,
-          remark: '年假'
-        },
-        {
-          id: 7,
-          employeeName: '周九',
-          attendanceDate: '2024-01-10',
-          checkInTime: '09:00:00',
-          checkOutTime: '18:00:00',
-          status: 1,
-          remark: '正常出勤'
-        },
-        {
-          id: 8,
-          employeeName: '吴十',
-          attendanceDate: '2024-01-10',
-          checkInTime: '09:45:00',
-          checkOutTime: '18:00:00',
-          status: 2,
-          remark: '迟到45分钟'
-        },
-        {
-          id: 9,
-          employeeName: '郑十一',
-          attendanceDate: '2024-01-10',
-          checkInTime: '09:00:00',
-          checkOutTime: '18:00:00',
-          status: 5,
-          remark: '外出培训'
-        },
-        {
-          id: 10,
-          employeeName: '王十二',
-          attendanceDate: '2024-01-10',
-          checkInTime: '',
-          checkOutTime: '',
-          status: 6,
-          remark: '病假'
-        }
+        // {
+        //   id: 1,
+        //   employeeName: '张三',
+        //   attendanceDate: '2024-01-10',
+        //   checkInTime: '09:00:00',
+        //   checkOutTime: '18:00:00',
+        //   status: 1,
+        //   remark: '正常出勤'
+        // }
       ],
       dialogVisible: false,
       dialogTitle: '',
@@ -290,27 +223,30 @@ export default {
         { value: 5, label: '外勤' },
         { value: 6, label: '请假' }
       ],
+      employeeList: [],
+      isEmployeeDisabled: false, // 控制员工选择框禁用
       form: {
         id: null,
         employeeName: '',
+        employeeId: '',
         attendanceDate: '',
-        checkInTime: '',
-        checkOutTime: '',
+        checkinTime: '',
+        checkoutTime: '',
         status: 1,
         remark: ''
       },
       rules: {
-        employeeName: [
+        employeeId: [
           { required: true, message: '请输入员工姓名', trigger: 'blur' }
         ],
         attendanceDate: [
-          { required: true, message: '请选择考勤日期', trigger: 'change' }
+          { required: true, message: '请选择考勤日期', trigger: 'blur' }
         ],
-        checkInTime: [
-          { required: true, message: '请选择签到时间', trigger: 'change' }
+        checkinTime: [
+          { required: true, message: '请选择签到时间', trigger: 'blur' }
         ],
-        checkOutTime: [
-          { required: true, message: '请选择签退时间', trigger: 'change' }
+        checkoutTime: [
+          { required: true, message: '请选择签退时间', trigger: 'blur' }
         ],
         status: [
           { required: true, message: '请选择考勤状态', trigger: 'change' }
@@ -320,16 +256,28 @@ export default {
   },
   created() {
     this.getAttendanceList()
+    this.getEmployeeList()
   },
   methods: {
+    // 获取员工列表
+    async getEmployeeList() {
+      const { records } = await getEmployeeList(this.queryParams)
+      this.employeeList = records
+    },
     // 获取考勤列表
     async getAttendanceList() {
       try {
-        const { data } = await getAttendanceList(this.queryParams)
-        this.attendanceList = data.rows
-        this.total = data.total
+        const { records, total } = await getAttendanceList(this.queryParams)
+        this.attendanceList = records
+        this.total = total // 赋值总数
       } catch (error) {
         console.error('获取考勤列表失败:', error)
+      }
+    },
+    handleEmployeeChange(employeeId) {
+      const employee = this.employeeList.find(item => item.id === employeeId)
+      if (employee) {
+        this.form.employeeName = employee.username
       }
     },
     // 获取状态文本
@@ -374,22 +322,26 @@ export default {
     // 添加考勤
     handleAdd() {
       this.dialogTitle = '添加考勤'
+      this.isEmployeeDisabled = false
       this.form = {
         id: null,
         employeeName: '',
         attendanceDate: '',
-        checkInTime: '',
-        checkOutTime: '',
+        checkinTime: '',
+        checkoutTime: '',
         status: this.attendanceStatus.NORMAL,
         remark: ''
       }
       this.dialogVisible = true
     },
     // 编辑考勤
-    handleEdit(row) {
+    async handleEdit(row) {
       this.dialogTitle = '编辑考勤'
-      this.form = { ...row }
       this.dialogVisible = true
+      this.isEmployeeDisabled = true
+      const attendanceData = await getAttendanceDetail(row.id)
+      console.log('attendanceData: ', attendanceData)
+      this.form = attendanceData
     },
     // 删除考勤
     handleDelete(id) {
@@ -421,13 +373,7 @@ export default {
         if (valid) {
           try {
             const formData = {
-              ...this.form,
-              attendanceDate: parseTime(
-                this.form.attendanceDate,
-                '{y}-{m}-{d}'
-              ),
-              checkInTime: parseTime(this.form.checkInTime, '{h}:{i}:{s}'),
-              checkOutTime: parseTime(this.form.checkOutTime, '{h}:{i}:{s}')
+              ...this.form
             }
 
             if (this.form.id) {
@@ -456,3 +402,46 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.app-container {
+  background: #fff;
+  // display: flex;
+  .total-count {
+  margin-right: 10px;
+  font-size: 14px;
+  color: gray;
+}
+  .left {
+    display:flex;
+    width: 350px;
+    align-items: center;
+    padding: 20px;
+    // border-right: 1px solid #eaeef4;
+.left-name{
+  width: 100px;
+  height:100%;
+  font-size: 15px;
+  color:#666666;
+}
+  }
+  .right {
+    flex: 1;
+    padding: 20px;
+    .opeate-tools {
+      margin:10px ;
+    }
+    .username {
+      height: 30px;
+      width: 30px;
+      line-height: 30px;
+      text-align: center;
+      border-radius: 50%;
+      color: #fff;
+      background: #04C9BE;
+      font-size: 12px;
+      display:inline-block;
+    }
+  }
+}
+
+</style>
