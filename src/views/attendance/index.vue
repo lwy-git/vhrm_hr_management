@@ -119,15 +119,21 @@
               v-model="form.attendanceDate"
               type="date"
               placeholder="选择日期"
+              value-format="yyyy-MM-dd"
             />
           </el-form-item>
           <el-form-item label="签到时间" prop="checkInTime">
-            <el-time-picker v-model="form.checkInTime" placeholder="选择时间" />
+            <el-time-picker
+              v-model="form.checkInTime"
+              placeholder="选择时间"
+              value-format="HH:mm:ss"
+            />
           </el-form-item>
           <el-form-item label="签退时间" prop="checkOutTime">
             <el-time-picker
               v-model="form.checkOutTime"
               placeholder="选择时间"
+              value-format="HH:mm:ss"
             />
           </el-form-item>
           <el-form-item label="考勤状态" prop="status">
@@ -172,8 +178,99 @@ export default {
         page: 1,
         pagesize: 10
       },
-      total: 0,
-      attendanceList: [],
+      total: 10,
+      attendanceList: [
+        {
+          id: 1,
+          employeeName: '张三',
+          attendanceDate: '2024-01-10',
+          checkInTime: '09:00:00',
+          checkOutTime: '18:00:00',
+          status: 1,
+          remark: '正常出勤'
+        },
+        {
+          id: 2,
+          employeeName: '李四',
+          attendanceDate: '2024-01-10',
+          checkInTime: '09:30:00',
+          checkOutTime: '18:00:00',
+          status: 2,
+          remark: '迟到30分钟'
+        },
+        {
+          id: 3,
+          employeeName: '王五',
+          attendanceDate: '2024-01-10',
+          checkInTime: '09:00:00',
+          checkOutTime: '17:00:00',
+          status: 3,
+          remark: '提前1小时离开'
+        },
+        {
+          id: 4,
+          employeeName: '赵六',
+          attendanceDate: '2024-01-10',
+          checkInTime: '',
+          checkOutTime: '',
+          status: 4,
+          remark: '全天未打卡'
+        },
+        {
+          id: 5,
+          employeeName: '钱七',
+          attendanceDate: '2024-01-10',
+          checkInTime: '09:00:00',
+          checkOutTime: '18:00:00',
+          status: 5,
+          remark: '外出客户拜访'
+        },
+        {
+          id: 6,
+          employeeName: '孙八',
+          attendanceDate: '2024-01-10',
+          checkInTime: '',
+          checkOutTime: '',
+          status: 6,
+          remark: '年假'
+        },
+        {
+          id: 7,
+          employeeName: '周九',
+          attendanceDate: '2024-01-10',
+          checkInTime: '09:00:00',
+          checkOutTime: '18:00:00',
+          status: 1,
+          remark: '正常出勤'
+        },
+        {
+          id: 8,
+          employeeName: '吴十',
+          attendanceDate: '2024-01-10',
+          checkInTime: '09:45:00',
+          checkOutTime: '18:00:00',
+          status: 2,
+          remark: '迟到45分钟'
+        },
+        {
+          id: 9,
+          employeeName: '郑十一',
+          attendanceDate: '2024-01-10',
+          checkInTime: '09:00:00',
+          checkOutTime: '18:00:00',
+          status: 5,
+          remark: '外出培训'
+        },
+        {
+          id: 10,
+          employeeName: '王十二',
+          attendanceDate: '2024-01-10',
+          checkInTime: '',
+          checkOutTime: '',
+          status: 6,
+          remark: '病假'
+        }
+      ],
       dialogVisible: false,
       dialogTitle: '',
       // 考勤状态枚举

@@ -36,15 +36,15 @@ export default {
         isAgrge: process.env.NODE_ENV === 'development'
       },
       LoginRules: {
-        mobile: [{
-          required: true,
-          message: '手机号不能为空',
-          trigger: 'blur'
-        }, {
-          pattern: /^1[3-9]\d{9}/,
-          message: '手机号格式不正确',
-          trigger: 'blur'
-        }],
+        // mobile: [{
+        //   required: true,
+        //   message: '手机号不能为空',
+        //   trigger: 'blur'
+        // }, {
+        //   pattern: /^1[3-9]\d{9}/,
+        //   message: '手机号格式不正确',
+        //   trigger: 'blur'
+        // }],
         password: [{
           required: true,
           message: '密码不能为空',

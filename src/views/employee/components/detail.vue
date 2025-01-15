@@ -50,12 +50,15 @@
           </el-row>
           <el-row>
             <el-col :span="12">
-              <el-form-item label="入职时间" prop="timeOfEntry">
+              <el-form-item
+                label="入职时间"
+                prop="timeofentry"
+              >
                 <el-date-picker
-                  v-model="userInfo.timeOfEntry"
+                  v-model="userInfo.timeofentry"
                   size="mini"
-                  type="date"
-                  value-format="yyyy-MM-dd"
+                  type="datetime"
+                  value-format="yyyy-MM-dd HH:mm:ss"
                   placeholder="请选择入职时间"
                   class="inputWidth"
                 />
@@ -65,7 +68,7 @@
           <el-row>
             <el-col :span="12">
               <el-form-item label="转正时间">
-                <el-date-picker v-model="userInfo.correctionTime" size="mini" type="date" class="inputWidth" placeholder="请选择转正时间" value-format="yyyy-MM-dd" />
+                <el-date-picker v-model="userInfo.correctionTime" size="mini" type="datetime" class="inputWidth" placeholder="请选择转正时间" value-format="yyyy-MM-dd HH:mm:ss" />
               </el-form-item>
             </el-col>
           </el-row>
@@ -93,6 +96,7 @@
 <script>
 import detailCascader from './detailCascader.vue'
 import imageUpload from './imageUpload.vue'
+import { getDepartment } from '@/api/department'
 import { addEmployee, getEmployeeDetail, updateEmployee } from '@/api/employee'
 export default {
   components: {
@@ -107,10 +111,12 @@ export default {
         workNumber: '', // 工号
         formOfEmployment: null, // 聘用形式
         departmentId: null, // 部门id
-        timeOfEntry: '', // 入职时间
+        departmentName: '', // 部门名称
+        timeofentry: '', // 入职时间
         correctionTime: '', // 转正时间
         staffPhoto: '' // 头像
       },
+      departmentList: [],
       rules: {
         username: [
           { required: true, message: '请输入姓名', trigger: 'blur' }
@@ -127,10 +133,10 @@ export default {
         formOfEmployment: [
           { required: true, message: '请选择聘用形式', trigger: 'blur' }
         ],
-        departmentId: [
-          { required: true, message: '请选择部门', trigger: 'blur' }
-        ],
-        timeOfEntry: [
+        // departmentId: [
+        //   { required: true, message: '请选择部门', trigger: 'blur' }
+        // ],
+        timeofentry: [
           { required: true, message: '请选择入职时间', trigger: 'blur' }
         ],
         correctionTime: [
@@ -154,11 +160,19 @@ export default {
   created() {
     // 点击详情时获取路由参数的中id，id存在获取详情数据
     this.$route.params.id && this.getEmployeeDetail()
+    this.getDepartment()
   },
   methods: {
+    async getDepartment() {
+      this.departmentList = await getDepartment()
+    },
     saveData() {
       this.$refs.userForm.validate(async valid => {
         if (valid) {
+          const department = this.departmentList.find((item) => item.id === this.userInfo.departmentId)
+          if (department) {
+            this.userInfo.departmentName = department.name
+          }
           if (this.$route.params.id) {
             // 有id是编辑更新
             await updateEmployee(this.userInfo)

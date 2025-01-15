@@ -9,8 +9,9 @@ const service = axios.create({
 
 service.interceptors.request.use(
   (config) => {
+    console.log('store.getters.token', store.getters.token)
     if (store.getters.token) {
-      config.headers.Authorization = `Bearer ${store.getters.token}`
+      config.headers['token'] = store.getters.token
     } return config
   }, (error) => {
     return Promise.reject(error)
@@ -21,12 +22,12 @@ service.interceptors.response.use((response) => {
   // axios默认包裹了data
   // 判断是不是Blob
   if (response.data instanceof Blob) return response.data // 返回了Blob对象
-  const { data, message, success } = response.data
-  if (success) {
+  const { data, msg } = response.data
+  if (msg === 'success') {
     return data
   } else {
-    Message({ type: 'error', message: message })
-    return Promise.reject(new Error(message))
+    Message({ type: 'error', message: msg })
+    return Promise.reject(new Error(msg))
   }
 },
 

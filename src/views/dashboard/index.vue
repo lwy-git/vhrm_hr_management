@@ -147,14 +147,29 @@ export default {
   data() {
     return {
       dashboardData: {
-        totalEmployees: 0,
-        newEmployees: 0,
-        departmentCount: 0,
-        averageYears: 0,
-        employeeTrendData: [],
-        departmentDistributionData: [],
-        ageDistributionData: [],
-        educationDistributionData: []
+        totalEmployees: 256,
+        newEmployees: 12,
+        departmentCount: 8,
+        averageYears: 3.5,
+        employeeTrendData: [15, 12, 18, 22, 16, 20, 25, 30, 28, 24, 20, 12],
+        departmentDistributionData: [
+          { value: 80, name: '技术部' },
+          { value: 45, name: '销售部' },
+          { value: 35, name: '市场部' },
+          { value: 30, name: '人事部' },
+          { value: 25, name: '财务部' },
+          { value: 20, name: '行政部' },
+          { value: 15, name: '法务部' },
+          { value: 6, name: '高管团队' }
+        ],
+        ageDistributionData: [45, 85, 65, 42, 19],
+        educationDistributionData: [
+          { value: 120, name: '本科' },
+          { value: 68, name: '硕士' },
+          { value: 45, name: '大专' },
+          { value: 18, name: '博士' },
+          { value: 5, name: '其他' }
+        ]
       },
       charts: [],
       showSuggestionDialog: false,
@@ -187,6 +202,10 @@ export default {
     async fetchDashboardData() {
       try {
         const response = await getDashboardData()
+        // 如果接口调用失败,使用本地数据
+        if (!response || !response.data) {
+          return
+        }
         this.dashboardData = response.data
       } catch (error) {
         console.error('获取仪表盘数据失败:', error)

@@ -39,10 +39,13 @@ module.exports = {
     proxy: {
       // path:目标服务器
       '/api': {
-        // target: 'http://localhost:8081/'  //本地服务
-        target: 'https://heimahr.itheima.net/'
+        target: 'http://localhost:8080/', // 本地服务
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api': ''
+        }
+        // target: 'https://heimahr.itheima.net/'
       }
-
     }
     // before: require('./mock/mock-server.js') 基础模板模拟数据 会拦截请求
   },

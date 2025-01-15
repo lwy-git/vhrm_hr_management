@@ -2,6 +2,7 @@
   <!-- element-ui级联组件 -->
   <el-cascader
     :value="value"
+    clearable
     size="mini"
     :options="treeData"
     :props="props"

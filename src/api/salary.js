@@ -1,99 +1,37 @@
 import request from '@/utils/request'
 
-export function getSalarysList(data) {
+export function getSalaryList(params) {
   return request({
-    url: '/salarys/list',
-    data,
-    method: 'post'
-  })
-}
-/**
- * 获取员工列表
- * **/
-
-export function getEmployeeList(params) {
-  return request({
-    url: '/sys/user',
-    params // 地址参数 查询参数
-  })
-}
-export function getTips(yearMonth) {
-  return request({
-    url: `/salarys/tips/${yearMonth}`
-  })
-}
-export function getSettings() {
-  return request({
-    url: '/salarys/settings'
+    url: '/salary/list',
+    params
   })
 }
 
-export function getCompanySetting() {
+export function addSalary(data) {
   return request({
-    url: '/salarys/company-settings'
-  })
-}
-export function saveSettings(data) {
-  return request({
-    url: '/salarys/settings',
-    method: 'post', data
-  })
-}
-
-export function getSalaryDetail(userId) {
-  return request({
-    url: `/salarys/modify/${userId}`
-  })
-}
-export function changeSalary(data) {
-  return request({
-    url: `/salarys/modify/${data.userId}`,
+    url: '/salary/add',
     method: 'post',
     data
   })
 }
-export function initSalary(data) {
+
+export function updateSalary(data) {
   return request({
-    url: `/salarys/init/${data.userId}`,
-    method: 'post',
-    data
-  })
-}
-export function getArchivingList(params) {
-  return request({
-    url: `/salarys/reports/${params.year}`,
-    params
-  })
-}
-export function getArchivingCont(params) {
-  return request({
-    url: `/salarys/reports/${params.yearMonth}`,
-    params
-  })
-}
-export function newReport(data) {
-  return request({
-    url: `/salarys/reports/${data.yearMonth}/newReport`,
+    url: `/salary/put/${data.id}`,
     method: 'put',
     data
   })
 }
-export function getArchivingExport(params) {
+
+export function deleteSalary(id) {
   return request({
-    url: `/salarys/reports/${params.yearMonth}/export`,
-    params
+    method: 'delete',
+    url: `/salary/delete/${id}`
   })
 }
-export function getArchivingFirst(params) {
+
+export function getSalaryDetail(id) {
   return request({
-    url: `/salarys/reports/${params.yearMonth}/first`,
-    params
-  })
-}
-export function getArchivingArchive(data) {
-  return request({
-    url: `/salarys/reports/${data.yearMonth}/archive`,
-    data,
-    method: 'post'
+    url: `/salary/detail/${id}`
   })
 }

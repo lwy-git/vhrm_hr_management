@@ -12,7 +12,7 @@ import employeeRouter from './modules/employee'
 import permissionRouter from './modules/permission'
 import roleRouter from './modules/role'
 import salaryRouter from './modules/salary'
-import socialRouter from './modules/social'
+import performanceRouter from './modules/performance'
 
 /**
  * 仅当路由的子路由长度大于等于 1 时，子菜单才会显示
@@ -57,11 +57,7 @@ export const constantRoutes = [
       component: () => import('@/views/dashboard/index'),
       meta: { title: '首页', icon: 'dashboard' }
     }]
-  }
-]
-
-// 动态路由
-export const asyncRoutes = [
+  },
   departmentRouter,
   roleRouter,
   employeeRouter,
@@ -69,8 +65,20 @@ export const asyncRoutes = [
   attendanceRouter,
   approvalRouter,
   salaryRouter,
-  socialRouter
+  performanceRouter
 ]
+
+// 动态路由
+// export const asyncRoutes = [
+//   departmentRouter,
+//   roleRouter,
+//   employeeRouter,
+//   permissionRouter,
+//   attendanceRouter,
+//   approvalRouter,
+//   salaryRouter
+//   // socialRouter
+// ]
 const createRouter = () => new Router({
   // mode: 'history',
   scrollBehavior: () => ({ y: 0 }),

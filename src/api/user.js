@@ -2,7 +2,7 @@ import request from '@/utils/request'
 // 登录
 export function login(data) {
   return request({
-    url: '/sys/login',
+    url: '/login',
     method: 'post',
     data
   })
@@ -10,7 +10,7 @@ export function login(data) {
 // 获取个人信息
 export function getUserInfo() {
   return request({
-    url: '/sys/profile'
+    url: '/profile'
   })
 }
 // 修改用户密码

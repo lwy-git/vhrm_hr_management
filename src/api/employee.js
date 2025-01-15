@@ -7,6 +7,14 @@ export function getEmployeeList(params) {
     params // 地址参数 查询参数
   })
 }
+// 获取所有员工数据
+
+export function getAllEmployee() {
+  return request({
+    url: '/sys/user/all'
+  })
+}
+
 // 员工导出
 
 export function exportEmployee() {

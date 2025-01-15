@@ -34,7 +34,8 @@
   </el-dialog>
 </template>
 <script>
-import { getDepartment, getManagerList, addDepartment, getDepartmentDetail, updateDepartment } from '@/api/department'
+import { getDepartment, addDepartment, getDepartmentDetail, updateDepartment } from '@/api/department'
+import { getAllEmployee } from '@/api/employee'
 export default {
   name: 'AddDept',
   props: {
@@ -54,7 +55,8 @@ export default {
         introduce: '', // 部门介绍
         managerId: '', // 部门负责人id
         name: '', // 部门名称
-        pid: '' // 父级部门的id
+        pid: '', // 父级部门的id
+        managerName: '' // 部门负责人名称
       },
       managerList: [], // 存储负责人列表
       rules: {
@@ -128,18 +130,24 @@ export default {
         introduce: '',
         managerId: '',
         name: '',
+        managerName: '',
         pid: ''
       }
       this.$refs.addDept.resetFields() // 重置表单
       this.$emit('update:showDialog', false)
     },
     async getManagerList() {
-      this.managerList = await getManagerList()
+      this.managerList = await getAllEmployee()
     },
     // 点击确定时调用
     btnOK() {
       this.$refs.addDept.validate(async isOK => {
         if (isOK) {
+          const name = this.managerList.find(item => item.id === this.formData.managerId)
+          if (name) {
+            this.formData.managerName = name.username
+          }
+
           let msg = '新增'
           if (this.formData.id) {
             // 编辑

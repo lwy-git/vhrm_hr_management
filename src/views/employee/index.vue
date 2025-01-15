@@ -31,7 +31,7 @@
       </div>
       <div class="right">
         <el-row class="opeate-tools" type="flex" justify="end">
-          <el-button v-permission="'add-employee'" size="mini" type="primary" @click="$router.push('/employee/detail')">添加员工</el-button>
+          <el-button size="mini" type="primary" @click="$router.push('/employee/detail')">添加员工</el-button>
           <el-button size="mini" @click="showExcelDialog = true">excel导入</el-button>
           <el-button size="mini" @click="exportEmployee">excel导出</el-button>
         </el-row>
@@ -54,7 +54,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="departmentName" label="部门" />
-          <el-table-column prop="timeOfEntry" label="入职时间" sortable />
+          <el-table-column prop="timeofentry" label="入职时间" sortable />
           <el-table-column label="操作" width="200px" align="center">
             <template v-slot="{row}">
               <el-button size="mini" type="text" @click="$router.push(`/employee/detail/${row.id}`)">查看</el-button>
@@ -140,8 +140,10 @@ export default {
   methods: {
     // 获取员工列表的方法
     async getEmployeeList() {
-      const { rows, total } = await getEmployeeList(this.queryParams)
-      this.employeeList = rows
+      const { records, total } = await getEmployeeList(this.queryParams)
+      // const res = await getEmployeeList(this.queryParams)
+      // console.log('res', res)
+      this.employeeList = records
       this.total = total // 赋值总数
     },
     // 切换页码

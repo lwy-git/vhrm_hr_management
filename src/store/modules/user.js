@@ -31,6 +31,7 @@ const actions = {
     console.log(data)
     // todo 调用接口返回token
     const token = await login(data)
+    console.log('token: ', token)
     context.commit('setToken', token)
   },
   async getUserInfo(context) {
