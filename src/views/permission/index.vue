@@ -1,20 +1,37 @@
 <template>
   <div class="container">
     <div class="app-container">
-      <el-button class="btnAdd" size="mini" type="primary" @click="addPermission(0, 1)">添加权限</el-button>
-      <el-table default-expand-all :data="permissionsList" row-key="id">
-        <el-table-column prop="name" label="名称" />
-        <el-table-column prop="code" label="标识" />
-        <el-table-column prop="description" label="描述" />
-        <el-table-column label="操作">
+      <el-button class="btnAdd" size="mini" type="primary" @click="addPermission">添加权限</el-button>
+      <el-table :data="permissionsList" style="margin-top: 30px; margin-left: 10px;">
+        <el-table-column align="center" prop="name" label="名称" />
+        <el-table-column align="center" prop="code" label="标识" />
+        <el-table-column align="center" prop="enVisible" label="描述">
+          <template slot-scope="scope">
+            <el-tag :type="getTagType(scope.row.enVisible)">{{ scope.row.enVisible?"启用":"停用" }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" prop="description" label="描述" />
+        <el-table-column align="center" label="操作" width="200">
           <template v-slot="{ row }">
-            <el-button v-if="row.type === 1" size="mini" type="text" @click="addPermission(row.id, 2)">添加</el-button>
             <el-button size="mini" type="text" @click="editPermission(row.id)">编辑</el-button>
             <el-button size="mini" type="text" @click="delPermission(row.id)">删除</el-button>
           </template>
 
         </el-table-column>
       </el-table>
+      <!-- 放置分页组件 -->
+      <el-row type="flex" style="height: 60px" align="middle" justify="end">
+        <span class="total-count">共 {{ total }} 条</span>
+        <!-- 放置分页组件 -->
+        <el-pagination
+          :page-size="pageParams.pagesize"
+          :current-page="pageParams.page"
+          :total="total"
+          background
+          layout="prev, pager, next"
+          @current-change="changePage"
+        />
+      </el-row>
     </div>
     <!-- 放置一个弹层 用来编辑新增节点 -->
     <el-dialog :title="`${showText}权限点`" :visible="showDialog" @close="btnCancel">
@@ -32,8 +49,10 @@
         <el-form-item label="开启">
           <el-switch
             v-model="formData.enVisible"
-            active-value="1"
-            inactive-value="0"
+            :active-value="1"
+            :inactive-value="0"
+            active-color="#13ce66"
+            size="mini"
           />
         </el-form-item>
       </el-form>
@@ -48,18 +67,20 @@
 </template>
 <script>
 import { getPermissionList, updatePermission, addPermission, getPermissionDetail, delPermission } from '@/api/permission'
-import { transListToTreeData } from '@/utils'
 export default {
   data() {
     return {
+      pageParams: {
+        page: 1, // 第几页
+        pagesize: 10// 每页多少条
+      },
+      total: 0, // 总数据量
       permissionsList: [],
       formData: {
         name: '', // 名称
         code: '', // 标识
         description: '', // 描述
-        type: '', // 类型 该类型 不需要显示 因为点击添加的时候已经知道类型了
-        pid: '', // 因为做的是树 需要知道添加到哪个节点下了
-        enVisible: '0' // 默认关闭
+        enVisible: 0 // 默认关闭
       },
       rules: {
         name: [{ required: true, message: '权限名称不能为空', trigger: 'blur' }],
@@ -78,13 +99,23 @@ export default {
   },
   methods: {
     async  getPermissionList() {
-      this.permissionsList = transListToTreeData(await getPermissionList(), 0)
+      const { records, total } = await getPermissionList(this.pageParams)
+      this.permissionsList = records
+      this.total = total // 赋值总数
     },
     // 添加一级权限
-    addPermission(pid, type) {
-      this.formData.pid = pid
-      this.formData.type = type
+    addPermission() {
       this.showDialog = true
+      this.formData = {
+        name: '', // 名称
+        code: '', // 标识
+        description: '', // 描述
+        enVisible: 0 // 默认关闭
+      }
+    },
+    getTagType(state) {
+      if (state === 0) return 'info'
+      if (state === 1) return 'success'
     },
     // 确定
 
@@ -109,9 +140,7 @@ export default {
         name: '', // 名称
         code: '', // 标识
         description: '', // 描述
-        type: '', // 类型 该类型 不需要显示 因为点击添加的时候已经知道类型了
-        pid: '', // 因为做的是树 需要知道添加到哪个节点下了
-        enVisible: '0' // 默认关闭
+        enVisible: 0 // 默认关闭
       }
       this.$refs.perForm.resetFields()
       this.showDialog = false
@@ -120,6 +149,10 @@ export default {
       // 根据获取id获取详情
       this.formData = await getPermissionDetail(id)
       this.showDialog = true
+    }, // 切换分页时 请求新的数据
+    changePage(newPage) {
+      this.pageParams.page = newPage // 赋值当前页码
+      this.getPermissionList()
     },
     delPermission(id) {
       // 删除权限
@@ -134,7 +167,9 @@ export default {
             type: 'success',
             message: '删除成功!'
           })
-          // if (this.roleList.length === 1) this.pageParams.page--
+          if (this.permissionsList.length === 1 && this.queryParams.page > 1) {
+            this.queryParams.page--
+          }
           this.getPermissionList()
         })
         .catch(() => {
@@ -148,8 +183,13 @@ export default {
 
 }
 </script>
-<style>
+<style lang="scss" scoped>
 .btnAdd {
   margin: 10px;
+}
+.total-count {
+  margin-right: 10px;
+  font-size: 14px;
+  color: gray;
 }
 </style>

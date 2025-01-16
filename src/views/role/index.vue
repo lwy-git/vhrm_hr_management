@@ -156,7 +156,6 @@ export default {
       },
       total: 0,
       roleForm: {
-        // id: null,
         name: '',
         description: '',
         state: 0 // 默认未1启用 关闭 0 打开1
@@ -298,7 +297,7 @@ export default {
   }
 }
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .role-operate {
   padding: 10px;
 }
