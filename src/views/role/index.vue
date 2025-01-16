@@ -58,12 +58,12 @@
       </el-table>
       <!-- 放置分页组件 -->
       <el-row type="flex" style="height: 60px" align="middle" justify="end">
-        <span class="total-count">共 {{ pageParams.total }} 条</span>
+        <span class="total-count">共 {{ total }} 条</span>
         <!-- 放置分页组件 -->
         <el-pagination
           :page-size="pageParams.pagesize"
           :current-page="pageParams.page"
-          :total="pageParams.total"
+          :total="total"
           background
           layout="prev, pager, next"
           @current-change="changePage"
@@ -152,10 +152,11 @@ export default {
       roleList: [],
       pageParams: {
         page: 1, // 第几页
-        pagesize: 5, // 每页多少条
-        total: 0
+        pagesize: 10// 每页多少条
       },
+      total: 0,
       roleForm: {
+        // id: null,
         name: '',
         description: '',
         state: 0 // 默认未1启用 关闭 0 打开1
@@ -179,9 +180,12 @@ export default {
   },
   methods: {
     async getRoleList() {
-      const { rows, total } = await getRoleList(this.pageParams)
-      this.roleList = rows
-      this.pageParams.total = total
+      const { records, total } = await getRoleList(this.pageParams)
+      this.roleList = records
+      debugger
+      console.log('total: ', total)
+      this.total = total // 赋值总数
+      // this.pageParams.total = total
       // 针对每一行数据添加一个编辑标记
       this.roleList.forEach((item) => {
       // item.isEdit = false // 添加一个属性 初始值为false /item.isEdit = false不具备响应式

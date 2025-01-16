@@ -3,7 +3,7 @@ import request from '@/utils/request'
 
 export function getRoleList(params) {
   return request({
-    url: '/sys/role',
+    url: '/role/list',
     params
   })
 }
@@ -11,7 +11,7 @@ export function getRoleList(params) {
 export function addRole(data) {
   return request({
     method: 'post',
-    url: '/sys/role',
+    url: '/role/add',
     data
   })
 }
@@ -20,7 +20,7 @@ export function addRole(data) {
 export function updateRole(data) {
   return request({
     method: 'put',
-    url: `/sys/role/${data.id}`,
+    url: `/role/put/${data.id}`,
     data
   })
 }
@@ -29,21 +29,21 @@ export function updateRole(data) {
 export function deleteRole(id) {
   return request({
     method: 'delete',
-    url: `/sys/role/${id}`
+    url: `/role/delete/${id}`
   })
 }
 
 // 获取角色详情
 export function getRoleDetail(id) {
   return request({
-    url: `/sys/role/${id}`
+    url: `/role/detail/${id}`
   })
 }
 
 // 确定分配权限
 export function assignPerm(data) {
   return request({
-    url: '/sys/role/assignPrem',
+    url: '/role/assignPermission',
     method: 'put',
     data
   })
