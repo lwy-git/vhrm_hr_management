@@ -104,7 +104,8 @@
 </template>
 
 <script>
-import { getEmployeeList, exportEmployee, delEmployee, getEnableRoleList, assignRole, getEmployeeDetail } from '@/api/employee'
+import { getEmployeeList, exportEmployee, delEmployee, assignRole, getEmployeeDetail } from '@/api/employee'
+import { getEnableRoleList } from '@/api/role'
 import FileSaver from 'file-saver'
 import ImportExcel from './components/importExcel.vue'
 export default {
@@ -210,7 +211,8 @@ export default {
     // 点击角色按钮弹出层
     async btnRole(id) {
       this.showRoleDialog = true
-      this.roleList = await getEnableRoleList()
+      const { records } = await getEnableRoleList({ page: 1, pagesize: 10, state: 1 })
+      this.roleList = records
       console.log('roleList', this.roleList)
       // 记录当前点击的id 因为后边 确定取消要存取给对应的用户
       this.currentUserId = id

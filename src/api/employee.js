@@ -75,17 +75,10 @@ export function updateEmployee(data) {
   })
 }
 
-// 获取可用角色，进行分配角色
-export function getEnableRoleList() {
-  return request({
-    url: '/sys/role/list/enabled'
-  })
-}
-
 // 员工分配角色
 export function assignRole(data) {
   return request({
-    url: '/sys/user/assignRoles',
+    url: '/emprole/user/assignRoles',
     method: 'put',
     data
   })

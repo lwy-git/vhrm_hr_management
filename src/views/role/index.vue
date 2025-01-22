@@ -142,7 +142,6 @@
 <script>
 import { getRoleList, addRole, updateRole, deleteRole, getRoleDetail, assignPerm } from '@/api/role'
 import { getPermissionList } from '@/api/permission'
-import { transListToTreeData } from '@/utils'
 export default {
   name: 'Role',
   data() {
@@ -278,7 +277,7 @@ export default {
       this.currentRoleId = id
       const { permIds } = await getRoleDetail(id)
       this.permIds = permIds
-      this.permissionData = transListToTreeData(await getPermissionList(), 0)
+      this.permissionData = await getPermissionList()
       this.showPermissionDialog = true
     },
     // 确定分配权限

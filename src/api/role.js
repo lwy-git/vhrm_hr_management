@@ -48,3 +48,10 @@ export function assignPerm(data) {
     data
   })
 }
+// 获取可用角色，进行分配角色
+export function getEnableRoleList(params) {
+  return request({
+    url: '/role/list/enabled',
+    params
+  })
+}
