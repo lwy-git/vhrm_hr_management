@@ -277,7 +277,8 @@ export default {
       this.currentRoleId = id
       const { permIds } = await getRoleDetail(id)
       this.permIds = permIds
-      this.permissionData = await getPermissionList()
+      const { records } = await getPermissionList(this.pageParams)
+      this.permissionData = records
       this.showPermissionDialog = true
     },
     // 确定分配权限

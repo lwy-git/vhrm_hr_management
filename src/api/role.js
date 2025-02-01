@@ -43,7 +43,7 @@ export function getRoleDetail(id) {
 // 确定分配权限
 export function assignPerm(data) {
   return request({
-    url: '/role/assignPermission',
+    url: '/rolePermission/role/assignPermissions',
     method: 'put',
     data
   })
