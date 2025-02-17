@@ -2,6 +2,7 @@ const getters = {
   sidebar: state => state.app.sidebar,
   device: state => state.app.device, // 获取当前应用所运行的设备类型
   token: state => state.user.token,
+  menus: state => state.user.menus,
   userId: state => state.user.userInfo.userId,
   avatar: state => state.user.userInfo.staffPhoto, // 头像
   name: state => state.user.userInfo.username,

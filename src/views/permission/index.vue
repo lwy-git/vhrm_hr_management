@@ -16,7 +16,6 @@
             <el-button size="mini" type="text" @click="editPermission(row.id)">编辑</el-button>
             <el-button size="mini" type="text" @click="delPermission(row.id)">删除</el-button>
           </template>
-
         </el-table-column>
       </el-table>
       <!-- 放置分页组件 -->

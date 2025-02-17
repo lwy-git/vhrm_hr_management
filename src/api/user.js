@@ -14,9 +14,9 @@ export function getUserInfo() {
   })
 }
 // 修改用户密码
-export function updatePass(data) {
+export function updatePass(data, id) {
   return request({
-    url: '/sys/user/updatePass',
+    url: `/sys/user/updatePass/${id}`,
     method: 'put',
     data
   })

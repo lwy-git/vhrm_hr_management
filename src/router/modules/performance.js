@@ -5,7 +5,7 @@ export default {
   component: layout,
   children: [{
     path: '',
-    name: 'social',
+    name: 'performance',
     component: () => import('@/views/performance'),
     meta: {
       title: '绩效',

@@ -57,7 +57,19 @@ export const constantRoutes = [
       component: () => import('@/views/dashboard/index'),
       meta: { title: '首页', icon: 'dashboard' }
     }]
-  },
+  }
+  // departmentRouter,
+  // roleRouter,
+  // employeeRouter,
+  // permissionRouter,
+  // attendanceRouter,
+  // approvalRouter,
+  // salaryRouter,
+  // performanceRouter
+]
+
+// 动态路由
+export const asyncRoutes = [
   departmentRouter,
   roleRouter,
   employeeRouter,
@@ -66,19 +78,8 @@ export const constantRoutes = [
   approvalRouter,
   salaryRouter,
   performanceRouter
+  // socialRouter
 ]
-
-// 动态路由
-// export const asyncRoutes = [
-//   departmentRouter,
-//   roleRouter,
-//   employeeRouter,
-//   permissionRouter,
-//   attendanceRouter,
-//   approvalRouter,
-//   salaryRouter
-//   // socialRouter
-// ]
 const createRouter = () => new Router({
   // mode: 'history',
   scrollBehavior: () => ({ y: 0 }),
