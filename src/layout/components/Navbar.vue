@@ -113,7 +113,10 @@ export default {
     changeConfirm() {
       this.$refs.passForm.validate(async isOk => {
         if (isOk) {
-          await updatePass(this.passForm)
+          const id = this.$store.getters.Id // 获取用户id
+          console.log('id: ', id)
+          debugger
+          await updatePass(this.passForm, id)
           this.$message.success('修改密码成功')
           this.$refs.passForm.resetFields()// 重置密码
           this.isShow = false // 关闭弹窗
