@@ -6,6 +6,12 @@ export function getSalaryList(params) {
     params
   })
 }
+export function getMySalaryList(params) {
+  return request({
+    url: '/salary/myList',
+    params
+  })
+}
 
 export function addSalary(data) {
   return request({

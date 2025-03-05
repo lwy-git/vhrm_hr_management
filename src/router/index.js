@@ -57,6 +57,19 @@ export const constantRoutes = [
       component: () => import('@/views/dashboard/index'),
       meta: { title: '首页', icon: 'dashboard' }
     }]
+  },
+  {
+    path: '/mySalary',
+    component: Layout,
+    children: [{
+      path: 'mySalary',
+      name: 'mySalary',
+      component: () => import('@/views/mySalary'),
+      meta: {
+        title: '我的工资',
+        icon: 'lock'
+      }
+    }]
   }
   // departmentRouter,
   // roleRouter,
