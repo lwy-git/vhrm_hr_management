@@ -1,5 +1,5 @@
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import { login, getUserInfo } from '@/api/user'
+import { login, getUserInfo, register } from '@/api/user'
 import { constantRoutes } from '@/router'
 import { resetRouter } from '@/router'
 const state = {
@@ -11,11 +11,11 @@ const state = {
 const mutations = {
   setToken(state, token) {
     state.token = token
-    setToken(token)// 获取的token同步到缓存
+    setToken(token) // 获取的token同步到缓存
   },
   removeToken(state) {
-    state.token = null// 删除vuex中的token
-    removeToken()// 退出时从缓存删除token
+    state.token = null // 删除vuex中的token
+    removeToken() // 退出时从缓存删除token
   },
   setUserInfo(state, userInfo) {
     state.userInfo = userInfo
@@ -41,6 +41,12 @@ const actions = {
     context.commit('setToken', token.jwt)
     context.commit('setUserInfo', token.emp)
     context.commit('setMenus', token.menus)
+  },
+  async register(context, data) {
+    console.log(data)
+    const res = await register(data)
+    console.log('res.data: ', res)
+    return res // 返回数据
   },
   async getUserInfo(context) {
     const res = await getUserInfo()

@@ -7,6 +7,13 @@ export function login(data) {
     data
   })
 }
+export function register(data) {
+  return request({
+    url: '/register',
+    method: 'post',
+    data
+  })
+}
 // 获取个人信息
 export function getUserInfo() {
   return request({

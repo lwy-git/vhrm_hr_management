@@ -215,9 +215,9 @@ export default {
       ]
     }
   },
-  // created() {
-  //   this.refreshImageCode()
-  // },
+  created() {
+    this.loadCaptcha(0)
+  },
   methods: {
     toggleMode() {
       this.isLogin = !this.isLogin
@@ -231,7 +231,7 @@ export default {
             const valid = await this.validateImageCode()
             if (!valid) {
               this.$message.error('验证码错误')
-              this.refreshImageCode()
+              this.loadCaptcha(0)
               return
             }
 
@@ -246,18 +246,28 @@ export default {
               this.$router.push('/')
             } else {
               // 注册逻辑
-              await this.$store.dispatch('user/register', {
+              const res = await this.$store.dispatch('user/register', {
                 mobile: this.formData.mobile,
                 password: this.formData.password,
+                confirmPassword: this.formData.confirmPassword,
+                isAgrge: this.formData.isAgrge,
                 imageCode: this.formData.imageCode
               })
+              debugger
+              console.log('res', res)
+
               this.$message.success('注册成功，请登录')
               this.isLogin = true
-              this.$refs.form.resetFields()
+              this.formData = {
+                mobile: res.mobile,
+                password: res.password,
+                confirmPassword: '',
+                imageCode: '',
+                isAgrge: false
+              }
             }
           } catch (error) {
             this.$message.error(error.message || (this.isLogin ? '登录失败' : '注册失败'))
-            this.refreshImageCode()
           }
         }
       })
@@ -297,12 +307,9 @@ export default {
         })
         .catch(function(error) {
           console.error('Error fetching captcha image:', error)
+          this.loadCaptcha(0)
         })
     },
-    // refreshImageCode() {
-    //   // 刷新验证码图片
-    //   this.imageCodeUrl = '/api/user/imageCode?t=' + Date.now()
-    // },
     showAgreement(e) {
       e.preventDefault() // 防止触发checkbox
       this.dialogVisible = true
