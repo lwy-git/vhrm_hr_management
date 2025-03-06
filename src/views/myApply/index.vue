@@ -8,7 +8,7 @@
             <i class="el-icon-document" />
           </div>
           <div class="data-content">
-            <div class="data-title">我的申请</div>
+            <div class="data-title">我的申请记录</div>
             <div class="data-number">{{ total }}条</div>
           </div>
         </div>
