@@ -2,8 +2,15 @@
   <div class="container">
     <div class="app-container">
       <!-- 工资卡片 -->
-      <el-card class="salary-card">
-        <div class="card-title">我的工资</div>
+      <el-card class="salary-card" shadow="hover">
+        <div class="data-card">
+          <div class="icon-wrapper bg-blue">
+            <i class="el-icon-money" />
+          </div>
+          <div class="data-content">
+            <div class="data-title">我的工资</div>
+          </div>
+        </div>
       </el-card>
 
       <!-- 搜索栏 -->
@@ -144,11 +151,11 @@ export default {
     }
   },
   created() {
-    this.getSalaryList()
+    this.getMySalaryList()
   },
   methods: {
     // 获取工资列表
-    async getSalaryList() {
+    async getMySalaryList() {
       const { records, total } = await getMySalaryList(this.queryParams)
       this.salaryList = records
       this.total = total
@@ -156,22 +163,17 @@ export default {
     // 搜索
     handleSearch() {
       this.queryParams.page = 1
-      this.getSalaryList()
+      this.getMySalaryList()
     },
     // 重置
     handleReset() {
-      this.queryParams = {
-        page: 1,
-        pagesize: 10,
-        month: '',
-        employeeId: store.getters.userId
-      }
-      this.getSalaryList()
+      this.queryParams.month = ''
+      this.getMySalaryList()
     },
     // 分页
     handleCurrentChange(val) {
       this.queryParams.page = val
-      this.getSalaryList()
+      this.getMySalaryList()
     },
     // 查看历史工资
     async handleHistory(row) {
@@ -187,18 +189,47 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .salary-card {
   margin-bottom: 20px;
 }
+
+.data-card {
+  display: flex;
+  align-items: center;
+
+  .icon-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+
+    i {
+      font-size: 30px;
+      color: #fff;
+    }
+  }
+
+  .data-content {
+    .data-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #303133;
+      margin-bottom: 8px;
+    }
+  }
+}
+
+.bg-blue {
+  background-color: #409eff;
+}
+
 .total-count {
   margin-right: 10px;
   font-size: 14px;
   color: gray;
-}
-.card-title {
-  font-size: 18px;
-  font-weight: bold;
-  color: #303133;
 }
 </style>
