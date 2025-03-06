@@ -1,6 +1,13 @@
 <template>
   <div class="container">
     <div class="app-container">
+      <!-- 步骤条 -->
+      <el-steps :active="step" finish-status="success">
+        <el-step title="筛选员工" description="根据条件筛选要评估的员工" />
+        <el-step title="填写评估" description="填写员工的绩效评估信息" />
+        <el-step title="提交评估" description="确认并提交绩效评估结果" />
+      </el-steps>
+
       <div class="search-bar">
         <el-input
           v-model="queryParams.employeeName"
@@ -59,6 +66,41 @@
           label="评估时间"
           align="center"
         />
+        <el-table-column
+          prop="workQualityScore"
+          label="工作质量"
+          align="center"
+        >
+          <template slot-scope="scope">
+            <el-tag :type="getScoreTagType(scope.row.workQualityScore)">{{ scope.row.workQualityScore }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="workEfficiencyScore"
+          label="工作效率"
+          align="center"
+        >   <template slot-scope="scope">
+          <el-tag :type="getScoreTagType(scope.row.workEfficiencyScore)">{{ scope.row.workEfficiencyScore }}</el-tag>
+        </template>
+        </el-table-column>
+        <el-table-column
+          prop="teamworkScore"
+          label="团队协作"
+          align="center"
+        >
+          <template slot-scope="scope">
+            <el-tag :type="getScoreTagType(scope.row.teamworkScore)">{{ scope.row.teamworkScore }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="attendanceScore"
+          label="出勤情况"
+          align="center"
+        >
+          <template slot-scope="scope">
+            <el-tag :type="getScoreTagType(scope.row.attendanceScore)">{{ scope.row.attendanceScore }}</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column
           prop="score"
           label="评分"
@@ -177,7 +219,60 @@
                 />
               </el-form-item>
             </el-col>
+          </el-row>
 
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="工作质量" prop="workQualityScore">
+                <el-input
+                  v-model.number="performanceForm.workQualityScore"
+                  placeholder="请输入0-100的分数"
+                  style="width: 100%"
+                  @input="calculateTotalScore"
+                >
+                  <template slot="append">分</template>
+                </el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="工作效率" prop="workEfficiencyScore">
+                <el-input
+                  v-model.number="performanceForm.workEfficiencyScore"
+                  placeholder="请输入0-100的分数"
+                  style="width: 100%"
+                  @input="calculateTotalScore"
+                >
+                  <template slot="append">分</template>
+                </el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="团队协作" prop="teamworkScore">
+                <el-input
+                  v-model.number="performanceForm.teamworkScore"
+                  placeholder="请输入0-100的分数"
+                  style="width: 100%"
+                  @input="calculateTotalScore"
+                >
+                  <template slot="append">分</template>
+                </el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="出勤情况" prop="attendanceScore">
+                <el-input
+                  v-model.number="performanceForm.attendanceScore"
+                  placeholder="请输入0-100的分数"
+                  style="width: 100%"
+                  @input="calculateTotalScore"
+                >
+                  <template slot="append">分</template>
+                </el-input>
+              </el-form-item>
+            </el-col>
           </el-row>
 
           <el-row :gutter="20">
@@ -187,7 +282,7 @@
                   v-model.number="performanceForm.score"
                   placeholder="请输入0-100的分数"
                   style="width: 100%"
-                  @input="calculateLevel"
+                  disabled
                 >
                   <template slot="append">分</template>
                 </el-input>
@@ -261,6 +356,10 @@ export default {
         employeeName: '',
         department: '',
         evaluationPeriod: '',
+        workQualityScore: 0,
+        workEfficiencyScore: 0,
+        teamworkScore: 0,
+        attendanceScore: 0,
         score: 0,
         level: '',
         comments: ''
@@ -272,13 +371,27 @@ export default {
         evaluationPeriod: [
           { required: true, message: '请选择评估时间', trigger: 'change' }
         ],
-        score: [
-          { required: true, message: '请输入评分', trigger: 'blur' }
+        workQualityScore: [
+          { required: true, message: '请输入工作质量评分', trigger: 'blur' },
+          { min: 0, max: 100, message: '评分范围为0-100', trigger: 'change' }
+        ],
+        workEfficiencyScore: [
+          { required: true, message: '请输入工作效率评分', trigger: 'blur' },
+          { min: 0, max: 100, message: '评分范围为0-100', trigger: 'change' }
+        ],
+        teamworkScore: [
+          { required: true, message: '请输入团队协作评分', trigger: 'blur' },
+          { min: 0, max: 100, message: '评分范围为0-100', trigger: 'change' }
+        ],
+        attendanceScore: [
+          { required: true, message: '请输入出勤情况评分', trigger: 'blur' },
+          { min: 0, max: 100, message: '评分范围为0-100', trigger: 'change' }
         ],
         comments: [
           { required: true, message: '请输入评语', trigger: 'blur' }
         ]
-      }
+      },
+      step: 1 // 新增步骤状态
     }
   },
   created() {
@@ -315,6 +428,7 @@ export default {
     handleSearch() {
       this.queryParams.page = 1
       this.getPerformanceList()
+      this.step = 1 // 搜索后回到第一步
     },
     resetQuery() {
       this.queryParams = {
@@ -325,6 +439,7 @@ export default {
         level: ''
       }
       this.getPerformanceList()
+      this.step = 1 // 重置后回到第一步
     },
     handleCurrentChange(val) {
       this.queryParams.page = val
@@ -336,6 +451,12 @@ export default {
         this.performanceForm.employeeName = employee.username
         this.performanceForm.department = employee.department
       }
+    },
+    calculateTotalScore() {
+      const { workQualityScore, workEfficiencyScore, teamworkScore, attendanceScore } = this.performanceForm
+      const totalScore = workQualityScore * 0.3 + workEfficiencyScore * 0.25 + teamworkScore * 0.25 + attendanceScore * 0.2
+      this.performanceForm.score = totalScore
+      this.calculateLevel(totalScore)
     },
     calculateLevel(score) {
       if (score >= 90) {
@@ -357,6 +478,10 @@ export default {
         employeeName: '',
         department: '',
         evaluationPeriod: '',
+        workQualityScore: 0,
+        workEfficiencyScore: 0,
+        teamworkScore: 0,
+        attendanceScore: 0,
         score: 0,
         level: '',
         comments: ''
@@ -365,6 +490,7 @@ export default {
       this.$nextTick(() => {
         this.$refs.performanceForm.clearValidate()
       })
+      this.step = 2 // 进入填写评估步骤
     },
     async handleEdit(id) {
       this.operationType = 'edit'
@@ -372,6 +498,7 @@ export default {
       const performanceData = await getPerformanceDetail(id)
       console.log('performanceData: ', performanceData)
       this.performanceForm = performanceData
+      this.step = 2 // 进入编辑评估步骤
     },
     handleDelete(id) {
       this.$confirm('确认删除该绩效记录?', '提示', {
@@ -386,6 +513,7 @@ export default {
         })
         if (this.performanceList.length === 1 && this.queryParams.page > 1) this.queryParams.page--
         this.getPerformanceList()
+        this.step = 1 // 删除后回到第一步
       }).catch(() => {})
     },
     async submitForm() {
@@ -401,6 +529,7 @@ export default {
             }
             this.dialogVisible = false
             this.getPerformanceList()
+            this.step = 3 // 提交后进入提交评估步骤
           } catch (error) {
             this.$message.error(this.operationType === 'add' ? '新增失败' : '更新失败')
           }
@@ -414,30 +543,29 @@ export default {
 <style lang="scss" scoped>
 .app-container {
   background: #fff;
-  // display: flex;
   .total-count {
-  margin-right: 10px;
-  font-size: 14px;
-  color: gray;
-}
+    margin-right: 10px;
+    font-size: 14px;
+    color: gray;
+  }
   .left {
-    display:flex;
+    display: flex;
     width: 350px;
     align-items: center;
     padding: 20px;
     // border-right: 1px solid #eaeef4;
-.left-name{
-  width: 100px;
-  height:100%;
-  font-size: 15px;
-  color:#666666;
-}
+    .left-name {
+      width: 100px;
+      height: 100%;
+      font-size: 15px;
+      color: #666666;
+    }
   }
   .right {
     flex: 1;
     padding: 20px;
     .opeate-tools {
-      margin:10px ;
+      margin: 10px;
     }
     .username {
       height: 30px;
@@ -448,8 +576,16 @@ export default {
       color: #fff;
       background: #04C9BE;
       font-size: 12px;
-      display:inline-block;
+      display: inline-block;
     }
+  }
+  // 调整步骤条上下左右间距
+  .el-steps {
+    padding: 20px 10px 20px 10px;
+    margin-top: 10px; // 上间距
+    margin-bottom: 10px; // 下间距
+    margin-left: 10px; // 左间距
+    margin-right: 10px; // 右间距
   }
 }
 </style>
