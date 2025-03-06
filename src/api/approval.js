@@ -20,6 +20,13 @@ export function rejectApplication(data) {
     data
   })
 }
+export function callbackApplication(data) {
+  return request({
+    url: `/approval/put/callback/${data.id}`,
+    method: 'put',
+    data
+  })
+}
 export function delApproval(id) {
   return request({
     method: 'delete',
@@ -29,5 +36,13 @@ export function delApproval(id) {
 export function getApprovalDetail(id) {
   return request({
     url: `/approval/detail/${id}`
+  })
+}
+// 提交申请
+export function submitApplication(data) {
+  return request({
+    url: '/approval/add',
+    method: 'post',
+    data
   })
 }

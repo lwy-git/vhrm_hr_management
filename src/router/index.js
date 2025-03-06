@@ -70,6 +70,19 @@ export const constantRoutes = [
         icon: 'lock'
       }
     }]
+  },
+  {
+    path: '/myApply',
+    component: Layout,
+    children: [{
+      path: 'myApply',
+      name: 'myApply',
+      component: () => import('@/views/myApply'),
+      meta: {
+        title: '我的申请',
+        icon: 'lock'
+      }
+    }]
   }
   // departmentRouter,
   // roleRouter,

@@ -8,7 +8,8 @@
             <i class="el-icon-money" />
           </div>
           <div class="data-content">
-            <div class="data-title">我的工资</div>
+            <div class="data-title">我的工资记录</div>
+            <div class="data-number">{{ total }}条</div>
           </div>
         </div>
       </el-card>
@@ -219,6 +220,11 @@ export default {
       font-weight: bold;
       color: #303133;
       margin-bottom: 8px;
+    }
+
+    .data-number {
+      font-size: 20px;
+      color: #409eff;
     }
   }
 }

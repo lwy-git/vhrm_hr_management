@@ -29,6 +29,7 @@
           <el-option label="待审批" value="pending" />
           <el-option label="已通过" value="approved" />
           <el-option label="已拒绝" value="rejected" />
+          <el-option label="已撤销" value="callbacked" />
         </el-select>
         <el-button
           size="small"
@@ -70,6 +71,10 @@
               v-if="scope.row.status === 'rejected'"
               type="danger"
             >已拒绝</el-tag>
+            <el-tag
+              v-if="scope.row.status === 'callbacked'"
+              type="warning"
+            >已撤销</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="200">
@@ -149,6 +154,10 @@
               v-if="currentRow.status === 'rejected'"
               type="danger"
             >已拒绝</el-tag>
+            <el-tag
+              v-if="currentRow.status === 'callbacked'"
+              type="warning"
+            >已撤销</el-tag>
           </el-descriptions-item>
         </el-descriptions>
       </el-dialog>
