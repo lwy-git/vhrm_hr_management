@@ -83,6 +83,19 @@ export const constantRoutes = [
         icon: 'lock'
       }
     }]
+  },
+  {
+    path: '/myPerformance',
+    component: Layout,
+    children: [{
+      path: 'myPerformance',
+      name: 'myPerformance',
+      component: () => import('@/views/myPerformance'),
+      meta: {
+        title: '我的绩效',
+        icon: 'lock'
+      }
+    }]
   }
   // departmentRouter,
   // roleRouter,
