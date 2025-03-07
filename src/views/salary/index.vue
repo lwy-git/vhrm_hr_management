@@ -401,6 +401,14 @@ export default {
 </script>
 <style lang="scss" scoped>
 .app-container {
+
+.search-bar {
+  margin: 20px 0;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
   background: #fff;
   // display: flex;
   .total-count {

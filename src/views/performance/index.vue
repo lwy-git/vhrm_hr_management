@@ -72,7 +72,7 @@
           align="center"
         >
           <template slot-scope="scope">
-            <el-tag :type="getScoreTagType(scope.row.workQualityScore)">{{ scope.row.workQualityScore }}</el-tag>
+            <div>{{ scope.row.workQualityScore }}</div>
           </template>
         </el-table-column>
         <el-table-column
@@ -80,7 +80,7 @@
           label="工作效率"
           align="center"
         >   <template slot-scope="scope">
-          <el-tag :type="getScoreTagType(scope.row.workEfficiencyScore)">{{ scope.row.workEfficiencyScore }}</el-tag>
+          <div>{{ scope.row.workEfficiencyScore }}</div>
         </template>
         </el-table-column>
         <el-table-column
@@ -89,7 +89,7 @@
           align="center"
         >
           <template slot-scope="scope">
-            <el-tag :type="getScoreTagType(scope.row.teamworkScore)">{{ scope.row.teamworkScore }}</el-tag>
+            <div>{{ scope.row.teamworkScore }}</div>
           </template>
         </el-table-column>
         <el-table-column
@@ -98,12 +98,12 @@
           align="center"
         >
           <template slot-scope="scope">
-            <el-tag :type="getScoreTagType(scope.row.attendanceScore)">{{ scope.row.attendanceScore }}</el-tag>
+            <div>{{ scope.row.attendanceScore }}</div>
           </template>
         </el-table-column>
         <el-table-column
           prop="score"
-          label="评分"
+          label="总评分"
           align="center"
         >
           <template slot-scope="scope">
@@ -130,11 +130,11 @@
           label="评语"
           show-overflow-tooltip
         />
-        <el-table-column
+        <!-- <el-table-column
           prop="createTime"
           label="创建时间"
           align="center"
-        />
+        /> -->
         <el-table-column
           label="操作"
           align="center"
@@ -227,6 +227,7 @@
                 <el-input
                   v-model.number="performanceForm.workQualityScore"
                   placeholder="请输入0-100的分数"
+                  type="number"
                   style="width: 100%"
                   @input="calculateTotalScore"
                 >
@@ -239,6 +240,7 @@
                 <el-input
                   v-model.number="performanceForm.workEfficiencyScore"
                   placeholder="请输入0-100的分数"
+                  type="number"
                   style="width: 100%"
                   @input="calculateTotalScore"
                 >
@@ -254,6 +256,7 @@
                 <el-input
                   v-model.number="performanceForm.teamworkScore"
                   placeholder="请输入0-100的分数"
+                  type="number"
                   style="width: 100%"
                   @input="calculateTotalScore"
                 >
@@ -266,6 +269,7 @@
                 <el-input
                   v-model.number="performanceForm.attendanceScore"
                   placeholder="请输入0-100的分数"
+                  type="number"
                   style="width: 100%"
                   @input="calculateTotalScore"
                 >
@@ -277,10 +281,10 @@
 
           <el-row :gutter="20">
             <el-col :span="12">
-              <el-form-item label="评分" prop="score">
+              <el-form-item label="总评分" prop="score">
                 <el-input
                   v-model.number="performanceForm.score"
-                  placeholder="请输入0-100的分数"
+                  type="number"
                   style="width: 100%"
                   disabled
                 >
@@ -322,6 +326,7 @@ import {
   getPerformanceDetail
 } from '@/api/performance'
 import { getEmployeeList } from '@/api/employee'
+import store from '@/store'
 export default {
   name: 'Performance',
   data() {
@@ -355,14 +360,16 @@ export default {
         employeeId: '',
         employeeName: '',
         department: '',
+        departmentId: '',
         evaluationPeriod: '',
-        workQualityScore: 0,
-        workEfficiencyScore: 0,
-        teamworkScore: 0,
-        attendanceScore: 0,
-        score: 0,
+        workQualityScore: '',
+        workEfficiencyScore: '',
+        teamworkScore: '',
+        attendanceScore: '',
+        score: '',
         level: '',
-        comments: ''
+        comments: '',
+        evaluator: store.getters.name
       },
       rules: {
         employeeId: [
@@ -373,19 +380,19 @@ export default {
         ],
         workQualityScore: [
           { required: true, message: '请输入工作质量评分', trigger: 'blur' },
-          { min: 0, max: 100, message: '评分范围为0-100', trigger: 'change' }
+          { type: 'number', min: 0, max: 100, message: '评分范围为0-100', trigger: 'change' }
         ],
         workEfficiencyScore: [
           { required: true, message: '请输入工作效率评分', trigger: 'blur' },
-          { min: 0, max: 100, message: '评分范围为0-100', trigger: 'change' }
+          { type: 'number', min: 0, max: 100, message: '评分范围为0-100', trigger: 'change' }
         ],
         teamworkScore: [
           { required: true, message: '请输入团队协作评分', trigger: 'blur' },
-          { min: 0, max: 100, message: '评分范围为0-100', trigger: 'change' }
+          { type: 'number', min: 0, max: 100, message: '评分范围为0-100', trigger: 'change' }
         ],
         attendanceScore: [
           { required: true, message: '请输入出勤情况评分', trigger: 'blur' },
-          { min: 0, max: 100, message: '评分范围为0-100', trigger: 'change' }
+          { type: 'number', min: 0, max: 100, message: '评分范围为0-100', trigger: 'change' }
         ],
         comments: [
           { required: true, message: '请输入评语', trigger: 'blur' }
@@ -449,7 +456,8 @@ export default {
       const employee = this.employeeList.find(item => item.id === employeeId)
       if (employee) {
         this.performanceForm.employeeName = employee.username
-        this.performanceForm.department = employee.department
+        this.performanceForm.department = employee.departmentName
+        this.performanceForm.departmentId = employee.departmentId
       }
     },
     calculateTotalScore() {
@@ -477,14 +485,16 @@ export default {
         employeeId: '',
         employeeName: '',
         department: '',
+        departmentId: '',
         evaluationPeriod: '',
-        workQualityScore: 0,
-        workEfficiencyScore: 0,
-        teamworkScore: 0,
-        attendanceScore: 0,
-        score: 0,
+        workQualityScore: '',
+        workEfficiencyScore: '',
+        teamworkScore: '',
+        attendanceScore: '',
+        score: '',
         level: '',
-        comments: ''
+        comments: '',
+        evaluator: store.getters.name
       }
       this.dialogVisible = true
       this.$nextTick(() => {
@@ -587,5 +597,12 @@ export default {
     margin-left: 10px; // 左间距
     margin-right: 10px; // 右间距
   }
+.search-bar {
+  margin: 20px 0;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
 }
 </style>
