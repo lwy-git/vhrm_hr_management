@@ -33,6 +33,10 @@
         <el-table-column prop="baseSalary" label="基本工资">
           <template v-slot="{ row }"> {{ row.baseSalary }}元 </template>
         </el-table-column>
+        <!-- 新增绩效工资列 -->
+        <el-table-column prop="performanceSalary" label="绩效工资">
+          <template v-slot="{ row }"> {{ row.performanceSalary }}元 </template>
+        </el-table-column>
         <el-table-column prop="bonus" label="奖金">
           <template v-slot="{ row }"> {{ row.bonus }}元 </template>
         </el-table-column>
@@ -109,6 +113,18 @@
               v-model="salaryForm.baseSalary"
               :min="0"
               :precision="2"
+              :step="100"
+              @change="changePerformanceSalary"
+            />
+          </el-form-item>
+          <!-- 新增绩效工资表单项 -->
+          <el-form-item label="绩效工资" prop="performanceSalary">
+            <el-input-number
+              v-model="salaryForm.performanceSalary"
+              :min="0"
+              :precision="2"
+              :step="100"
+              disabled
               @change="calculateActualSalary"
             />
           </el-form-item>
@@ -117,6 +133,7 @@
               v-model="salaryForm.bonus"
               :min="0"
               :precision="2"
+              :step="100"
               @change="calculateActualSalary"
             />
           </el-form-item>
@@ -125,6 +142,7 @@
               v-model="salaryForm.deduction"
               :min="0"
               :precision="2"
+              :step="100"
               @change="calculateActualSalary"
             />
           </el-form-item>
@@ -134,9 +152,9 @@
           <el-form-item label="日期" prop="month">
             <el-date-picker
               v-model="salaryForm.month"
-              type="datetime"
+              type="date"
               placeholder="选择日期"
-              value-format="yyyy-MM-dd HH:mm:ss"
+              value-format="yyyy-MM-dd"
             />
           </el-form-item>
         </el-form>
@@ -170,10 +188,14 @@
             </div>
             <div style="display: flex; justify-content: space-around; margin-bottom: 10px">
               <span>基本工资: {{ item.baseSalary }}元</span>
+              <!-- 新增绩效工资显示 -->
+              <span>绩效工资: {{ item.performanceSalary }}元</span>
+            </div>
+            <div style="display: flex; justify-content: space-around; margin-bottom: 10px">
+              <span>扣款: {{ item.deduction }}元</span>
               <span>奖金: {{ item.bonus }}元</span>
             </div>
-            <div style="display: flex; justify-content: space-around">
-              <span>扣款: {{ item.deduction }}元</span>
+            <div>
               <span style="color: #67C23A; font-weight: bold">实发工资: {{ item.actualSalary }}元</span>
             </div>
           </div>
@@ -195,7 +217,7 @@ import {
   getSalaryDetail
 } from '@/api/salary'
 import { getEmployeeList } from '@/api/employee'
-
+import { getPerformanceList } from '@/api/performance'
 export default {
   name: 'Salary',
   data() {
@@ -214,6 +236,7 @@ export default {
         //   employeeName: '张三',
         //   employeeId: 1,
         //   baseSalary: 8000,
+        //   performanceSalary: 1000, // 新增绩效工资字段
         //   bonus: 2000,
         //   deduction: 500,
         //   actualSalary: 9500,
@@ -222,6 +245,7 @@ export default {
         //     {
         //       month: '2023-12',
         //       baseSalary: 7800,
+        //       performanceSalary: 800, // 新增绩效工资字段
         //       bonus: 1800,
         //       deduction: 400,
         //       actualSalary: 9200
@@ -229,6 +253,7 @@ export default {
         //     {
         //       month: '2023-11',
         //       baseSalary: 7600,
+        //       performanceSalary: 600, // 新增绩效工资字段
         //       bonus: 1600,
         //       deduction: 300,
         //       actualSalary: 8900
@@ -236,6 +261,7 @@ export default {
         //     {
         //       month: '2023-10',
         //       baseSalary: 7400,
+        //       performanceSalary: 400, // 新增绩效工资字段
         //       bonus: 1400,
         //       deduction: 200,
         //       actualSalary: 8600
@@ -254,6 +280,7 @@ export default {
         employeeName: '',
         employeeId: '',
         baseSalary: '',
+        performanceSalary: '', // 新增绩效工资字段
         bonus: '',
         deduction: '',
         actualSalary: '',
@@ -266,6 +293,9 @@ export default {
         ],
         baseSalary: [
           { required: true, message: '请输入基本工资', trigger: 'blur' }
+        ],
+        performanceSalary: [
+          { required: true, message: '请输入绩效工资', trigger: 'blur' }
         ],
         month: [{ required: true, message: '请选择日期', trigger: 'blur' }]
       },
@@ -329,6 +359,7 @@ export default {
         employeeName: '',
         employeeId: '',
         baseSalary: '',
+        performanceSalary: '', // 新增绩效工资字段
         bonus: '',
         deduction: '',
         actualSalary: '',
@@ -355,6 +386,61 @@ export default {
       console.log('salaryHistory: ', this.salaryHistory)
       this.historyDialogVisible = true
     },
+    async changePerformanceSalary() {
+      console.log(111)
+
+      const { records } = await getPerformanceList({ page: 1,
+        pagesize: 10, employeeId: this.salaryForm.employeeId, period: this.salaryForm.month })
+      this.salaryForm.performanceSalary = this.calculatePerformanceSalary(this.salaryForm.baseSalary, records[0].level)
+      console.log('records[0].level', records[0].level)
+      let rate = 0
+      switch (records[0].level) {
+        case 'A':
+          rate = 1.5
+          break
+        case 'B':
+          rate = 1
+          break
+        case 'C':
+          rate = 0.8
+          break
+        case 'D':
+          rate = 0.5
+          break
+        case 'E':
+          rate = 0
+          break
+        default:
+          rate = 0
+      }
+      this.salaryForm.performanceSalary = (Number(this.salaryForm.baseSalary) * rate).toFixed(2)
+      this.calculateActualSalary()
+    },
+    // 计算绩效工资
+    // calculatePerformanceSalary(baseSalary, performanceLevel) {
+    //   let rate = 0
+    //   switch (performanceLevel) {
+    //     case 'A':
+    //       rate = 1.5
+    //       break
+    //     case 'B':
+    //       rate = 1
+    //       break
+    //     case 'C':
+    //       rate = 0.8
+    //       break
+    //     case 'D':
+    //       rate = 0.5
+    //       break
+    //     case 'E':
+    //       rate = 0
+    //       break
+    //     default:
+    //       rate = 0
+    //   }
+    //   this.salaryForm.performanceSalary = (Number(baseSalary) * rate).toFixed(2)
+    //   this.calculateActualSalary()
+    // },
     // 提交表单
     async submitForm() {
       try {
@@ -392,9 +478,9 @@ export default {
     },
     // 计算实发工资
     calculateActualSalary() {
-      const { baseSalary = 0, bonus = 0, deduction = 0 } = this.salaryForm
+      const { baseSalary = 0, performanceSalary = 0, bonus = 0, deduction = 0 } = this.salaryForm
       this.salaryForm.actualSalary =
-        Number(baseSalary) + Number(bonus) - Number(deduction)
+        Number(baseSalary) + Number(performanceSalary) + Number(bonus) - Number(deduction)
     }
   }
 }
