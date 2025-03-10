@@ -212,9 +212,9 @@
               <el-form-item label="评估时间" prop="evaluationPeriod">
                 <el-date-picker
                   v-model="performanceForm.evaluationPeriod"
-                  type="date"
+                  type="month"
                   placeholder="选择评估日期"
-                  value-format="yyyy-MM-dd"
+                  value-format="yyyy-MM"
                   style="width: 100%"
                 />
               </el-form-item>
@@ -279,22 +279,41 @@
             </el-col>
           </el-row>
 
-          <el-row :gutter="20">
+          <el-row :gutter="24">
             <el-col :span="12">
               <el-form-item label="总评分" prop="score">
-                <el-input
-                  v-model.number="performanceForm.score"
-                  type="number"
-                  style="width: 100%"
-                  disabled
-                >
-                  <template slot="append">分</template>
-                </el-input>
+                <div style="display: flex; align-items: center;">
+                  <el-input
+                    v-model.number="performanceForm.score"
+                    type="number"
+                    style="width: 100%"
+                    disabled
+                  >
+                    <template slot="append">分</template>
+                  </el-input>
+
+                  <el-tooltip content="总评分的计算方式为：工作质量权重30%，工作效率权重25%，团队协作权重25%，出勤情况权重20%" placement="top">
+                    <i
+                      class="el-icon-question"
+                      style="cursor: pointer; font-size: 20px; color:#E6A23C; margin-left: 10px;"
+                    />
+                  </el-tooltip>
+                </div>
               </el-form-item>
             </el-col>
+
             <el-col :span="12">
               <el-form-item label="等级">
-                <el-input v-model="performanceForm.level" disabled />
+                <div style="display: flex; align-items: center;">
+                  <el-input v-model="performanceForm.level" disabled />
+
+                  <el-tooltip content="绩效等级评定：90分及以上为A，80 - 89分为B，70 - 79分为C，60 - 69分为D，60分以下为E" placement="top">
+                    <i
+                      class="el-icon-question"
+                      style="cursor: pointer; font-size: 20px; color:#E6A23C; margin-left: 10px;"
+                    />
+                  </el-tooltip>
+                </div>
               </el-form-item>
             </el-col>
           </el-row>

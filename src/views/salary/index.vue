@@ -33,6 +33,9 @@
         <el-table-column prop="baseSalary" label="基本工资">
           <template v-slot="{ row }"> {{ row.baseSalary }}元 </template>
         </el-table-column>
+        <el-table-column prop="performanceSalary" label="绩效等级">
+          <template v-slot="{ row }">  <el-tag :type="getLevelTagType(row.level)">{{ row.level }}</el-tag></template>
+        </el-table-column>
         <!-- 新增绩效工资列 -->
         <el-table-column prop="performanceSalary" label="绩效工资">
           <template v-slot="{ row }"> {{ row.performanceSalary }}元 </template>
@@ -93,6 +96,15 @@
           :rules="rules"
           label-width="100px"
         >
+          <el-form-item label="日期" prop="month">
+            <el-date-picker
+              v-model="salaryForm.month"
+              type="month"
+              placeholder="选择日期"
+              style="width: 200px;"
+              value-format="yyyy-MM"
+            />
+          </el-form-item>
           <el-form-item label="员工" prop="employeeName">
             <el-select
               v-model="salaryForm.employeeId"
@@ -107,6 +119,9 @@
                 :value="item.id"
               />
             </el-select>
+          </el-form-item>
+          <el-form-item label="绩效等级" prop="level" style="width: 300px;">
+            <el-input v-model="salaryForm.level" disabled />
           </el-form-item>
           <el-form-item label="基本工资" prop="baseSalary">
             <el-input-number
@@ -127,8 +142,18 @@
               disabled
               @change="calculateActualSalary"
             />
+            <el-tooltip content="绩效工资根据绩效等级：A为基本工资的150%，B为基本工资的100%，C为基本工资的80%，D为基本工资的50%，E为基本工资的0%" placement="top">
+              <i
+                class="el-icon-question"
+                style="margin-left: 10px;
+                                  cursor: pointer;
+                                  font-size: 20px;
+                                  color:#E6A23C;
+                                 "
+              />
+            </el-tooltip>
           </el-form-item>
-          <el-form-item label="奖金">
+          <el-form-item label="奖金" prop="bonus">
             <el-input-number
               v-model="salaryForm.bonus"
               :min="0"
@@ -137,7 +162,7 @@
               @change="calculateActualSalary"
             />
           </el-form-item>
-          <el-form-item label="扣款">
+          <el-form-item label="扣款" prop="deduction">
             <el-input-number
               v-model="salaryForm.deduction"
               :min="0"
@@ -146,16 +171,8 @@
               @change="calculateActualSalary"
             />
           </el-form-item>
-          <el-form-item label="实发工资">
+          <el-form-item label="实发工资" prop="actualSalary">
             <el-input v-model="salaryForm.actualSalary" disabled />
-          </el-form-item>
-          <el-form-item label="日期" prop="month">
-            <el-date-picker
-              v-model="salaryForm.month"
-              type="date"
-              placeholder="选择日期"
-              value-format="yyyy-MM-dd"
-            />
           </el-form-item>
         </el-form>
         <div slot="footer">
@@ -288,16 +305,26 @@ export default {
       },
       // 表单规则
       rules: {
-        employeeId: [
+        employeeName: [
           { required: true, message: '请选择员工', trigger: 'change' }
         ],
         baseSalary: [
           { required: true, message: '请输入基本工资', trigger: 'blur' }
         ],
+        bonus: [
+          { required: true, message: '请输入奖金', trigger: 'blur' }
+        ],
+        deduction: [
+          { required: true, message: '请输入扣款', trigger: 'blur' }
+        ],
         performanceSalary: [
           { required: true, message: '请输入绩效工资', trigger: 'blur' }
         ],
-        month: [{ required: true, message: '请选择日期', trigger: 'blur' }]
+        level: [
+          { required: true, message: '请输入绩效等级', trigger: 'blur' }
+        ],
+        month: [{ required: true, message: '请选择日期', trigger: 'blur' }],
+        actualSalary: [{ required: true, message: '请选择实发工资', trigger: 'blur' }]
       },
       // 操作类型
       operationType: 'add',
@@ -312,6 +339,16 @@ export default {
     this.getEmployeeList()
   },
   methods: {
+    getLevelTagType(level) {
+      const types = {
+        A: 'success',
+        B: '',
+        C: 'warning',
+        D: 'danger',
+        E: 'info'
+      }
+      return types[level] || ''
+    },
     // 获取工资列表
     async getSalaryList() {
       const { records, total } = await getSalaryList(this.queryParams)
@@ -325,10 +362,14 @@ export default {
       this.employeeList = records
     },
     // 员工选择改变
-    handleEmployeeChange(employeeId) {
+    async  handleEmployeeChange(employeeId) {
       const employee = this.employeeList.find((item) => item.id === employeeId)
       if (employee) {
         this.salaryForm.employeeName = employee.username
+        const { records } = await getPerformanceList({ page: 1,
+          pagesize: 10, employeeId: this.salaryForm.employeeId, period: this.salaryForm.month })
+        console.log('records[0].level', records[0].level)
+        this.salaryForm.level = records[0].level
       }
     },
     // 搜索
@@ -359,6 +400,7 @@ export default {
         employeeName: '',
         employeeId: '',
         baseSalary: '',
+        level: '',
         performanceSalary: '', // 新增绩效工资字段
         bonus: '',
         deduction: '',
@@ -391,7 +433,6 @@ export default {
 
       const { records } = await getPerformanceList({ page: 1,
         pagesize: 10, employeeId: this.salaryForm.employeeId, period: this.salaryForm.month })
-      this.salaryForm.performanceSalary = this.calculatePerformanceSalary(this.salaryForm.baseSalary, records[0].level)
       console.log('records[0].level', records[0].level)
       let rate = 0
       switch (records[0].level) {
