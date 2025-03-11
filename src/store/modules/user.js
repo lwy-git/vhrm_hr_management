@@ -1,11 +1,11 @@
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { getToken, setToken, removeToken, getMenus, setMenus, removeMenus, getUserInfos, setUserInfo, removeUserInfo } from '@/utils/auth'
 import { login, getUserInfo, register } from '@/api/user'
 import { constantRoutes } from '@/router'
 import { resetRouter } from '@/router'
 const state = {
   token: getToken(), // 从缓存读取token初始值
-  userInfo: {},
-  menus: [],
+  userInfo: getUserInfos(),
+  menus: getMenus(),
   routes: constantRoutes // 静态路由的数组
 }
 const mutations = {
@@ -19,9 +19,19 @@ const mutations = {
   },
   setUserInfo(state, userInfo) {
     state.userInfo = userInfo
+    setUserInfo(userInfo)
+  },
+  removeUserInfo(state) {
+    state.userInfo = null // 删除vuex中的userInfo
+    removeUserInfo() // 退出时从缓存删除userInfo
   },
   setMenus(state, menus) {
     state.menus = menus
+    setMenus(menus)
+  },
+  removeMenus(state) {
+    state.menus = null // 删除vuex中的menus
+    removeMenus() // 退出时从缓存删除menus
   },
   // 添加动态路由，菜单未显示
   // 动态添加路由,不具备响应式，使用vuex共享路由信息
@@ -55,8 +65,8 @@ const actions = {
   },
   logout(context) {
     context.commit('removeToken')
-    context.commit('setUserInfo', {})
-    context.commit('setMenus', {})
+    context.commit('removeUserInfo', {})
+    context.commit('removeMenus', [])
     // 重置路由,防止上个用户的权限遗留在新登录的用户上
     resetRouter()
   }
