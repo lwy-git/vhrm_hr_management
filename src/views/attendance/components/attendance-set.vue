@@ -239,16 +239,16 @@ export default {
   },
   async created() {
     this.stateData = []
-    const res = await getAttendanceConfig()
-    console.log('res', res)
-
-    this.formBase.morningStartTime = res.morningStartTime
-    this.formBase.afternoonEndTime = res.afternoonEndTime
-    console.log('this.formBase.morningStartTime', this.formBase.morningStartTime)
   },
   methods: {
-    dialogFormV() {
+    async dialogFormV() {
       this.dialogFormVisible = true
+      const res = await getAttendanceConfig()
+      console.log('res', res)
+
+      this.formBase.morningStartTime = res.morningStartTime
+      this.formBase.afternoonEndTime = res.afternoonEndTime
+      console.log('this.formBase.morningStartTime', this.formBase.morningStartTime)
     },
     dialogFormH() {
       this.dialogFormVisible = false
@@ -258,7 +258,7 @@ export default {
     },
     handleClose() {
       this.dialogFormH()
-      this.clearFormDate()
+      // this.clearFormDate()
     },
     async handleAttendance() {
       this.$refs.dataForm.validate(async valid => {
