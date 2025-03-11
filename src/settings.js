@@ -1,5 +1,5 @@
 module.exports = {
-  title: '鸣潮角色后台管理系统', // 网站的标题
+  title: '企业员工管理系统', // 网站的标题
 
   /**
    * @type {boolean} true | false

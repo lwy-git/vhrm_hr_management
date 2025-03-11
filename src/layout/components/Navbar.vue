@@ -18,9 +18,9 @@
               首页
             </el-dropdown-item>
           </router-link>
-          <a target="_blank" href="https://gitee.com/longwangyang/lwyhr">
+          <!-- <a target="_blank" href="https://gitee.com/longwangyang/lwyhr">
             <el-dropdown-item>项目地址</el-dropdown-item>
-          </a>
+          </a> -->
           <!-- prevent阻止a标签默认事件 -->
           <a target="_blank" @click.prevent="updatePassword">
             <el-dropdown-item>修改密码</el-dropdown-item>
