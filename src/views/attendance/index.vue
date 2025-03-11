@@ -51,6 +51,11 @@
             type="primary"
             @click="handleAdd"
           >添加考勤</el-button>
+          <el-button
+            size="mini"
+            type="primary"
+            @click="handleSet"
+          >考勤设置</el-button>
           <el-button size="mini" @click="handleExport">导出考勤</el-button>
         </el-row>
 
@@ -167,11 +172,14 @@
           <el-button type="primary" @click="submitForm">确 定</el-button>
         </div>
       </el-dialog>
+      <!-- 设置组件 -->
+      <attendance-set ref="set" @handleCloseModal="handleCloseModal" @dataSearch="handleDataSearch" />
     </div>
   </div>
 </template>
 
 <script>
+import AttendanceSet from './components/attendance-set'
 import {
   getAttendanceList,
   addAttendance,
@@ -184,6 +192,7 @@ import { getEmployeeList } from '@/api/employee'
 
 export default {
   name: 'Attendance',
+  components: { AttendanceSet },
   data() {
     return {
       queryParams: {
@@ -259,6 +268,17 @@ export default {
     this.getEmployeeList()
   },
   methods: {
+    handleDataSearch() {
+      this.getAttendanceList()
+    },
+    // 设置
+    handleSet() {
+      this.$refs.set.dialogFormV()
+    },
+    // 弹框关闭
+    handleCloseModal() {
+      this.$refs.set.dialogFormH()
+    },
     // 获取员工列表
     async getEmployeeList() {
       const { records } = await getEmployeeList(this.queryParams)

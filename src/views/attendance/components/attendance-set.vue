@@ -1,0 +1,347 @@
+<template>
+  <div class="add-form">
+    <el-dialog title="设置" :visible.sync="dialogFormVisible">
+      <el-tabs v-model="activeName" style="margin-left:20px" @tab-click="handleClick">
+        <el-tab-pane label="出勤设置" name="first">
+          <el-form
+            ref="dataForm"
+            :rules="rules"
+            :model="formBase"
+            label-position="right"
+            label-width="100px"
+            style="width:700px;"
+            class="titmInfo"
+          >
+            <el-form-item label="出勤时间：" prop="morningStartTime" style="">
+              <el-time-select
+                v-model="formBase.morningStartTime"
+                :picker-options="{
+                  start: '00:00',
+                  step: '00:30',
+                  end: '14:00'
+                }"
+                :placeholder="formBase.morningStartTime"
+                class="timePicker"
+              />
+              -
+              <el-time-select
+                v-model="formBase.afternoonEndTime"
+                :picker-options="{
+                  start: '14:00',
+                  step: '00:30',
+                  end: '24:00'
+                }"
+                :placeholder="formBase.afternoonEndTime"
+                class="timePicker"
+              />
+            </el-form-item>
+          </el-form>
+          <div class="el-dialog__footer dialog-footer">
+            <el-button type="primary" @click="handleAttendance">保存更新</el-button>
+            <el-button @click="handleClose">取消</el-button>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="扣款设置" name="third">
+          <el-form
+            ref="deductionsForm"
+            :rules="rules"
+            :model="deductionsBase"
+            label-position="right"
+            label-width="80px"
+            class="titmInfo"
+          />
+          <el-table ref="singleTable" :data="stateData.departmentType" style="width: 100%">
+            <el-table-column>
+              <template slot-scope="scope">
+                <div>
+                  {{ scope.row.name }}
+                  <el-switch
+                    v-model="scope.row.isEnable"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949"
+                    @change="handleStatus($event,scope.row)"
+                  />
+                </div>
+
+                <div v-if="scope.row.dedTypeCode==='51000'" class="attentInfo">
+                  <p>
+                    迟到≤
+                    <el-input
+                      v-model="scope.row.periodUpperLimit"
+                      class="inputInfo"
+                      value="30"
+                      @input.native="handleInput($event)"
+                    />分钟
+                  </p>
+                  <div class="deductionInfo">
+                    <p>
+                      迟到≤
+                      <el-input
+                        v-model="scope.row.timesUpperLimit"
+                        class="inputInfo"
+                        @input.native="handleInput($event)"
+                      />次，每次扣款
+                      <el-input
+                        v-model="scope.row.dedAmonutUpperLimit"
+                        class="inputInfo"
+                        @input.native="handleInput($event)"
+                      />元
+                    </p>
+                    <p>
+                      迟到>
+                      <el-input
+                        v-model="scope.row.timesLowerLimit"
+                        class="inputInfo"
+                        disabled
+                        @input.native="handleInput($event)"
+                      />次，每次扣款
+                      <el-input
+                        v-model="scope.row.dedAmonutLowerLimit"
+                        class="inputInfo"
+                        @input.native="handleInput($event)"
+                      />元
+                    </p>
+                  </div>
+                  <p>
+                    迟到>
+                    <el-input v-model="scope.row.periodLowerLimit" class="inputInfo" disabled />分钟
+                  </p>
+                  <div class="deductionInfo">
+                    <p>
+                      迟到>
+                      <el-input
+                        v-model="scope.row.absenceTimesUpperLimt"
+                        class="inputInfo"
+                        disabled
+                      />次，每次矿工
+                      <el-input
+                        v-model="scope.row.absenceDays"
+                        class="inputInfo"
+                        @input.native="handleInputPoint($event)"
+                      />天
+                    </p>
+                  </div>
+                </div>
+                <div v-if="scope.row.dedTypeCode==='52000'" class="attentInfo">
+                  <p>
+                    早退≤
+                    <el-input
+                      v-model="scope.row.periodUpperLimit"
+                      class="inputInfo"
+                      value="30"
+                      @input.native="handleInput($event)"
+                    />分钟
+                  </p>
+                  <div class="deductionInfo">
+                    <p>
+                      早退≤
+                      <el-input
+                        v-model="scope.row.timesUpperLimit"
+                        class="inputInfo"
+                        @input.native="handleInput($event)"
+                      />次，每次扣款
+                      <el-input
+                        v-model="scope.row.dedAmonutUpperLimit"
+                        class="inputInfo"
+                        @input.native="handleInput($event)"
+                      />元
+                    </p>
+                    <p>
+                      早退>
+                      <el-input v-model="scope.row.timesLowerLimit" class="inputInfo" disabled />次，每次扣款
+                      <el-input
+                        v-model="scope.row.dedAmonutLowerLimit"
+                        class="inputInfo"
+                        @input.native="handleInput($event)"
+                      />元
+                    </p>
+                  </div>
+                  <p>
+                    早退>
+                    <el-input v-model="scope.row.periodLowerLimit" class="inputInfo" disabled />分钟
+                  </p>
+                  <div style="padding-left:120px;">
+                    <p>
+                      早退>
+                      <el-input
+                        v-model="scope.row.absenceTimesUpperLimt"
+                        class="inputInfo"
+                        disabled
+                      />次，每次矿工
+                      <el-input
+                        v-model="scope.row.absenceDays"
+                        class="inputInfo"
+                        @input.native="handleInputPoint($event)"
+                      />天
+                    </p>
+                  </div>
+                </div>
+                <div v-if="scope.row.dedTypeCode==='53000'" class="attentInfo">
+                  <p>
+                    矿工按
+                    <el-input
+                      v-model="scope.row.fineSalaryMultiples"
+                      class="inputInfo"
+                      @input.native="handleInput($event)"
+                    />倍工资处罚
+                  </p>
+                </div>
+              </template>
+            </el-table-column>
+          </el-table>
+          <div class="el-dialog__footer dialog-footer">
+            <el-button type="primary" @click="handleDeductions">保存更新</el-button>
+            <el-button @click="handleClose">取消</el-button>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import {
+  attendanceSave,
+  getAttendanceConfig,
+  deductionsSave
+} from '@/api/attendance'
+
+export default {
+  name: 'AttendanceSet',
+  props: [],
+  data() {
+    return {
+      dialogFormVisible: false,
+      isShowSelect: false,
+      activeName: 'first',
+      formBase: {
+        morningStartTime: '',
+        afternoonEndTime: ''
+      },
+      deductionsBase: {},
+      departmentData: [],
+      stateData: [],
+      oldNum: '',
+      rules: {
+        morningStartTime: [
+          { required: true, message: '请选择上午开始时间', trigger: 'change' }
+        ],
+        afternoonEndTime: [
+          { required: true, message: '请选择下午结束时间', trigger: 'change' }
+        ]
+      }
+    }
+  },
+  computed: {
+    inpNum() {
+      return this.oldNum
+    }
+  },
+  async created() {
+    this.stateData = []
+    const res = await getAttendanceConfig()
+    console.log('res', res)
+
+    this.formBase.morningStartTime = res.morningStartTime
+    this.formBase.afternoonEndTime = res.afternoonEndTime
+    console.log('this.formBase.morningStartTime', this.formBase.morningStartTime)
+  },
+  methods: {
+    dialogFormV() {
+      this.dialogFormVisible = true
+    },
+    dialogFormH() {
+      this.dialogFormVisible = false
+    },
+    clearFormDate() {
+      this.formBase = {}
+    },
+    handleClose() {
+      this.dialogFormH()
+      this.clearFormDate()
+    },
+    async handleAttendance() {
+      this.$refs.dataForm.validate(async valid => {
+        if (valid) {
+          await attendanceSave(this.formBase)
+          this.$emit('dataSearch')
+          this.handleClose()
+        }
+      })
+    },
+    handleDeductions() {
+      this.$refs.deductionsForm.validate(async valid => {
+        if (valid) {
+          var deductionList = this.stateData.departmentType
+          deductionList.forEach(item => {
+            if (item.isEnable) {
+              item.isEnable = '0'
+            } else {
+              item.isEnable = '1'
+            }
+          })
+          await deductionsSave(deductionList)
+          this.$emit('dataSearch')
+          this.handleClose()
+        }
+      })
+    },
+    handleClick(tab, event) {
+      // 移除对部门相关方法的调用
+    },
+    typeTip(obj) {
+      this.$message.error(obj)
+    },
+    handleInput: function(e) {
+      // getInteger(e, this.typeTip)
+    },
+    handleInputPoint(e) {
+      // getIntegerPoint(e)
+    },
+    handleStatus(e, obj) {
+      // 移除对部门相关数据的引用
+    }
+  }
+}
+</script>
+
+<style rel="stylesheet/scss" lang="scss">
+.inputInfo{width: 50px;}
+
+.attentInfo {
+  p {
+    padding: 3px 0;
+  }
+  .el-input--medium {
+    .el-input__inner {
+      height: 24px;
+      line-height: 24px;
+    }
+  }
+}
+.titmInfo {
+  .el-date-editor--timerange.el-input__inner {
+    width: 280px;
+  }
+  .el-date-editor .el-range-separator {
+    padding: 0 15px 0 0;
+  }
+}
+</style>
+
+<style rel="stylesheet/scss" lang="scss" scoped>
+.tipInfo {
+  p {
+    padding: 5px 0;
+  }
+}
+.titInfo {
+  border-bottom: 1px solid #dcdfe6;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 0 15px;
+}
+.attentInfo {
+  padding: 30px 15px 15px 80px;
+}
+</style>

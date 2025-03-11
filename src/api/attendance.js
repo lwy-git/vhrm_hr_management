@@ -34,3 +34,17 @@ export function deleteAttendance(id) {
     url: `/attendance/delete/${id}`
   })
 }
+// 修改考勤设置
+export function attendanceSave(data) {
+  return request({
+    url: '/attendanceConfig/updateAllAttendance',
+    method: 'post',
+    data
+  })
+}
+// 获取考勤设置/getAttendanceConfig
+export function getAttendanceConfig() {
+  return request({
+    url: `/attendanceConfig/getAttendanceConfig`
+  })
+}
