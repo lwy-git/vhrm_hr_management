@@ -292,7 +292,7 @@
                     <template slot="append">分</template>
                   </el-input>
 
-                  <el-tooltip content="总评分的计算方式为：工作质量权重30%，工作效率权重25%，团队协作权重25%，出勤情况权重20%" placement="top">
+                  <el-tooltip content="总评分的计算方式为：工作质量权重30%，工作效率权重25%，团队协作权重25%，出勤情况权重20%" placement="top" effect="light">
                     <i
                       class="el-icon-question"
                       style="cursor: pointer; font-size: 20px; color:#E6A23C; margin-left: 10px;"
@@ -307,7 +307,7 @@
                 <div style="display: flex; align-items: center;">
                   <el-input v-model="performanceForm.level" disabled />
 
-                  <el-tooltip content="绩效等级评定：90分及以上为A，80 - 89分为B，70 - 79分为C，60 - 69分为D，60分以下为E" placement="top">
+                  <el-tooltip content="绩效等级评定：90分及以上为A，80 - 89分为B，70 - 79分为C，60 - 69分为D，60分以下为E" placement="top" effect="light">
                     <i
                       class="el-icon-question"
                       style="cursor: pointer; font-size: 20px; color:#E6A23C; margin-left: 10px;"

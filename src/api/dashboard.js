@@ -4,7 +4,7 @@ import request from '@/utils/request'
 
 export function getHomeData() {
   return request({
-    url: '/home/data'
+    url: '/sys/dashboard'
   })
 }
 // 获取消息

@@ -28,6 +28,26 @@
             </el-col>
           </el-row>
           <el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="年龄" prop="age">
+                  <el-input v-model="userInfo.age" placeholder="请输入年龄" size="mini" class="inputWidth" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="学历" prop="education">
+                  <el-select v-model="userInfo.education" placeholder="请选择学历" size="mini" class="inputWidth">
+                    <el-option label="大专" value="大专" />
+                    <el-option label="本科" value="本科" />
+                    <el-option label="硕士" value="硕士" />
+                    <el-option label="博士" value="博士" />
+                    <el-option label="其他" value="其他" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+            </el-row>
             <el-col :span="12">
               <el-form-item label="部门" prop="departmentId">
                 <!-- 放置及联部门组件 -->
@@ -109,6 +129,8 @@ export default {
         username: '', // 用户名
         mobile: '', // 手机号
         workNumber: '', // 工号
+        age: '', // 年龄
+        education: '', // 学历
         formOfEmployment: null, // 聘用形式
         departmentId: null, // 部门id
         departmentName: '', // 部门名称
@@ -120,6 +142,15 @@ export default {
       rules: {
         username: [
           { required: true, message: '请输入姓名', trigger: 'blur' }
+        ],
+        age: [
+          { required: true, message: '请输入年龄', trigger: 'blur' }
+        ],
+        education: [
+          { required: true, message: '请选择学历', trigger: 'change' }
+        ],
+        workNumber: [
+          { required: true, message: '请输入学历', trigger: 'blur' }
         ],
         mobile: [
           { required: true, message: '请输入手机号', trigger: 'blur' },

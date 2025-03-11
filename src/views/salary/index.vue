@@ -142,7 +142,7 @@
               disabled
               @change="calculateActualSalary"
             />
-            <el-tooltip content="绩效工资根据绩效等级：A为基本工资的150%，B为基本工资的100%，C为基本工资的80%，D为基本工资的50%，E为基本工资的0%" placement="top">
+            <el-tooltip content="绩效工资根据绩效等级：A为基本工资的150%，B为基本工资的100%，C为基本工资的80%，D为基本工资的50%，E为基本工资的0%" placement="top" effect="light">
               <i
                 class="el-icon-question"
                 style="margin-left: 10px;
@@ -172,7 +172,7 @@
             />
           </el-form-item>
           <el-form-item label="实发工资" prop="actualSalary">
-            <el-input v-model="salaryForm.actualSalary" disabled />
+            <el-input v-model.number="salaryForm.actualSalary" disabled />
           </el-form-item>
         </el-form>
         <div slot="footer">
@@ -457,31 +457,6 @@ export default {
       this.salaryForm.performanceSalary = (Number(this.salaryForm.baseSalary) * rate).toFixed(2)
       this.calculateActualSalary()
     },
-    // 计算绩效工资
-    // calculatePerformanceSalary(baseSalary, performanceLevel) {
-    //   let rate = 0
-    //   switch (performanceLevel) {
-    //     case 'A':
-    //       rate = 1.5
-    //       break
-    //     case 'B':
-    //       rate = 1
-    //       break
-    //     case 'C':
-    //       rate = 0.8
-    //       break
-    //     case 'D':
-    //       rate = 0.5
-    //       break
-    //     case 'E':
-    //       rate = 0
-    //       break
-    //     default:
-    //       rate = 0
-    //   }
-    //   this.salaryForm.performanceSalary = (Number(baseSalary) * rate).toFixed(2)
-    //   this.calculateActualSalary()
-    // },
     // 提交表单
     async submitForm() {
       try {
@@ -521,7 +496,8 @@ export default {
     calculateActualSalary() {
       const { baseSalary = 0, performanceSalary = 0, bonus = 0, deduction = 0 } = this.salaryForm
       this.salaryForm.actualSalary =
-        Number(baseSalary) + Number(performanceSalary) + Number(bonus) - Number(deduction)
+        baseSalary + performanceSalary + bonus - deduction
+      this.salaryForm.actualSalary = parseFloat(this.salaryForm.actualSalary).toFixed(2)
     }
   }
 }
