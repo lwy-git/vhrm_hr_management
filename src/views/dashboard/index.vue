@@ -170,7 +170,7 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: ['5-7k', '8-10k', '10-12k', '13-15k', '15k以上']
+          data: ['5k以下', '6-10k', '10-15k', '16-20k', '20k以上']
         },
         yAxis: {
           type: 'value'
@@ -210,7 +210,7 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: ['20-25岁', '26-30岁', '31-35岁', '36-40岁', '40岁以上']
+          data: ['25岁以下', '26-35岁', '36-45岁', '46-55岁', '55岁以上']
         },
         yAxis: {
           type: 'value'
