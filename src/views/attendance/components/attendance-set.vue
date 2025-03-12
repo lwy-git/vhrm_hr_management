@@ -50,7 +50,7 @@
             label-width="80px"
             class="titmInfo"
           />
-          <el-table ref="singleTable" :data="stateData.departmentType" style="width: 100%">
+          <el-table ref="singleTable" :data="stateData" style="width: 100%">
             <el-table-column>
               <template slot-scope="scope">
                 <div>
@@ -63,27 +63,30 @@
                   />
                 </div>
 
-                <div v-if="scope.row.dedTypeCode==='51000'" class="attentInfo">
+                <div v-if="scope.row.dedTypeCode==='1'" class="attentInfo">
                   <p>
                     迟到≤
                     <el-input
                       v-model="scope.row.periodUpperLimit"
                       class="inputInfo"
                       value="30"
+
                       @input.native="handleInput($event)"
                     />分钟
                   </p>
-                  <div class="deductionInfo">
+                  <div style="padding-left:120px;">
                     <p>
                       迟到≤
                       <el-input
                         v-model="scope.row.timesUpperLimit"
                         class="inputInfo"
+
                         @input.native="handleInput($event)"
                       />次，每次扣款
                       <el-input
                         v-model="scope.row.dedAmonutUpperLimit"
                         class="inputInfo"
+
                         @input.native="handleInput($event)"
                       />元
                     </p>
@@ -92,11 +95,13 @@
                       <el-input
                         v-model="scope.row.timesLowerLimit"
                         class="inputInfo"
+
                         disabled
                         @input.native="handleInput($event)"
                       />次，每次扣款
                       <el-input
                         v-model="scope.row.dedAmonutLowerLimit"
+
                         class="inputInfo"
                         @input.native="handleInput($event)"
                       />元
@@ -104,45 +109,50 @@
                   </div>
                   <p>
                     迟到>
-                    <el-input v-model="scope.row.periodLowerLimit" class="inputInfo" disabled />分钟
+                    <el-input v-model="scope.row.periodLowerLimit" class="inputInfo" disabled style="width: 60px;" />分钟
                   </p>
-                  <div class="deductionInfo">
+                  <div style="padding-left:120px;">
                     <p>
                       迟到>
                       <el-input
                         v-model="scope.row.absenceTimesUpperLimt"
                         class="inputInfo"
+
                         disabled
-                      />次，每次矿工
+                      />次，每次迟到记矿工
                       <el-input
                         v-model="scope.row.absenceDays"
                         class="inputInfo"
+
                         @input.native="handleInputPoint($event)"
                       />天
                     </p>
                   </div>
                 </div>
-                <div v-if="scope.row.dedTypeCode==='52000'" class="attentInfo">
+                <div v-if="scope.row.dedTypeCode==='2'" class="attentInfo">
                   <p>
                     早退≤
                     <el-input
                       v-model="scope.row.periodUpperLimit"
                       class="inputInfo"
+
                       value="30"
                       @input.native="handleInput($event)"
                     />分钟
                   </p>
-                  <div class="deductionInfo">
+                  <div style="padding-left:120px;">
                     <p>
                       早退≤
                       <el-input
                         v-model="scope.row.timesUpperLimit"
                         class="inputInfo"
+
                         @input.native="handleInput($event)"
                       />次，每次扣款
                       <el-input
                         v-model="scope.row.dedAmonutUpperLimit"
                         class="inputInfo"
+
                         @input.native="handleInput($event)"
                       />元
                     </p>
@@ -176,14 +186,14 @@
                     </p>
                   </div>
                 </div>
-                <div v-if="scope.row.dedTypeCode==='53000'" class="attentInfo">
+                <div v-if="scope.row.dedTypeCode==='3'" class="attentInfo">
                   <p>
-                    矿工按
+                    每次矿工扣款
                     <el-input
-                      v-model="scope.row.fineSalaryMultiples"
+                      v-model="scope.row.dedAbsence"
                       class="inputInfo"
                       @input.native="handleInput($event)"
-                    />倍工资处罚
+                    />元一天
                   </p>
                 </div>
               </template>
@@ -203,6 +213,7 @@
 import {
   attendanceSave,
   getAttendanceConfig,
+  getstateData,
   deductionsSave
 } from '@/api/attendance'
 
@@ -249,6 +260,12 @@ export default {
       this.formBase.morningStartTime = res.morningStartTime
       this.formBase.afternoonEndTime = res.afternoonEndTime
       console.log('this.formBase.morningStartTime', this.formBase.morningStartTime)
+      const resData = await getstateData()
+      this.stateData = resData
+      for (let i = 0; i < this.stateData.length; i++) {
+        this.stateData[i].isEnable = Boolean(this.stateData[i].isEnable)
+      }
+      console.log('resData', resData)
     },
     dialogFormH() {
       this.dialogFormVisible = false
@@ -263,7 +280,8 @@ export default {
     async handleAttendance() {
       this.$refs.dataForm.validate(async valid => {
         if (valid) {
-          await attendanceSave(this.formBase)
+          const res = await attendanceSave(this.formBase)
+          this.$message.success(res)
           this.$emit('dataSearch')
           this.handleClose()
         }
@@ -272,15 +290,18 @@ export default {
     handleDeductions() {
       this.$refs.deductionsForm.validate(async valid => {
         if (valid) {
-          var deductionList = this.stateData.departmentType
+          var deductionList = this.stateData
           deductionList.forEach(item => {
             if (item.isEnable) {
-              item.isEnable = '0'
+              item.isEnable = 1
             } else {
-              item.isEnable = '1'
+              item.isEnable = 0
             }
           })
-          await deductionsSave(deductionList)
+          console.log('deductionList', deductionList)
+
+          const res = await deductionsSave(deductionList)
+          this.$message.success(res)
           this.$emit('dataSearch')
           this.handleClose()
         }
@@ -306,7 +327,7 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
-.inputInfo{width: 50px;}
+.inputInfo{width: 60px;}
 
 .attentInfo {
   p {

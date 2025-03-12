@@ -34,7 +34,7 @@ export function deleteAttendance(id) {
     url: `/attendance/delete/${id}`
   })
 }
-// 修改考勤设置
+// 修改考勤时间设置
 export function attendanceSave(data) {
   return request({
     url: '/attendanceConfig/updateAllAttendance',
@@ -42,9 +42,23 @@ export function attendanceSave(data) {
     data
   })
 }
-// 获取考勤设置/getAttendanceConfig
+// 获取考勤时间设置/getAttendanceConfig
 export function getAttendanceConfig() {
   return request({
     url: `/attendanceConfig/getAttendanceConfig`
+  })
+}
+// 获取扣款数据getstateData
+export function getstateData() {
+  return request({
+    url: `/attendanceConfig/getAttendanceConfigList`
+  })
+}
+// 保存扣款数据deductionsSave
+export function deductionsSave(data) {
+  return request({
+    url: '/attendanceConfig/updateAttendanceConfig',
+    method: 'post',
+    data
   })
 }
