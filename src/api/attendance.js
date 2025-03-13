@@ -62,3 +62,10 @@ export function deductionsSave(data) {
     data
   })
 }
+// 计算每月扣款/calculateDeduction
+export function calculateDeduction(params) {
+  return request({
+    url: `/attendanceConfig/calculateDeduction`,
+    params
+  })
+}

@@ -233,6 +233,7 @@ import {
   deleteSalary,
   getSalaryDetail
 } from '@/api/salary'
+import { calculateDeduction } from '@/api/attendance'
 import { getEmployeeList } from '@/api/employee'
 import { getPerformanceList } from '@/api/performance'
 export default {
@@ -370,6 +371,10 @@ export default {
           pagesize: 10, employeeId: this.salaryForm.employeeId, period: this.salaryForm.month })
         console.log('records[0].level', records[0].level)
         this.salaryForm.level = records[0].level
+        const res = await calculateDeduction({ employeeId: this.salaryForm.employeeId, month: this.salaryForm.month })
+        console.log('res', res)
+
+        this.salaryForm.deduction = res
       }
     },
     // 搜索
@@ -496,7 +501,7 @@ export default {
     calculateActualSalary() {
       const { baseSalary = 0, performanceSalary = 0, bonus = 0, deduction = 0 } = this.salaryForm
       this.salaryForm.actualSalary =
-        baseSalary + performanceSalary + bonus - deduction
+        Number(baseSalary) + Number(performanceSalary) + Number(bonus) - Number(deduction)
       this.salaryForm.actualSalary = parseFloat(this.salaryForm.actualSalary).toFixed(2)
     }
   }

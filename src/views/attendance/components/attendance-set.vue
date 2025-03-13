@@ -64,125 +64,69 @@
                 </div>
 
                 <div v-if="scope.row.dedTypeCode==='1'" class="attentInfo">
-                  <p>
-                    迟到≤
-                    <el-input
-                      v-model="scope.row.periodUpperLimit"
-                      class="inputInfo"
-                      value="30"
 
-                      @input.native="handleInput($event)"
-                    />分钟
-                  </p>
-                  <div style="padding-left:120px;">
+                  <div>
                     <p>
                       迟到≤
                       <el-input
-                        v-model="scope.row.timesUpperLimit"
+                        v-model="scope.row.periodUpperLimit"
                         class="inputInfo"
+                        value="30"
 
                         @input.native="handleInput($event)"
-                      />次，每次扣款
+                      />分钟，每次扣款
                       <el-input
-                        v-model="scope.row.dedAmonutUpperLimit"
+                        v-model="scope.row.dedPeriodUpper"
                         class="inputInfo"
 
-                        @input.native="handleInput($event)"
-                      />元
-                    </p>
-                    <p>
-                      迟到>
-                      <el-input
-                        v-model="scope.row.timesLowerLimit"
-                        class="inputInfo"
-
-                        disabled
-                        @input.native="handleInput($event)"
-                      />次，每次扣款
-                      <el-input
-                        v-model="scope.row.dedAmonutLowerLimit"
-
-                        class="inputInfo"
                         @input.native="handleInput($event)"
                       />元
                     </p>
                   </div>
-                  <p>
-                    迟到>
-                    <el-input v-model="scope.row.periodLowerLimit" class="inputInfo" disabled style="width: 60px;" />分钟
-                  </p>
-                  <div style="padding-left:120px;">
+
+                  <div>
                     <p>
                       迟到>
+                      <el-input v-model="scope.row.periodLowerLimit" class="inputInfo" disabled style="width: 60px;" />分钟，每次扣款
                       <el-input
-                        v-model="scope.row.absenceTimesUpperLimt"
-                        class="inputInfo"
-
-                        disabled
-                      />次，每次迟到记矿工
-                      <el-input
-                        v-model="scope.row.absenceDays"
+                        v-model="scope.row.dedPeriodLower"
                         class="inputInfo"
 
                         @input.native="handleInputPoint($event)"
-                      />天
+                      />元
                     </p>
                   </div>
                 </div>
                 <div v-if="scope.row.dedTypeCode==='2'" class="attentInfo">
-                  <p>
-                    早退≤
-                    <el-input
-                      v-model="scope.row.periodUpperLimit"
-                      class="inputInfo"
 
-                      value="30"
-                      @input.native="handleInput($event)"
-                    />分钟
-                  </p>
-                  <div style="padding-left:120px;">
+                  <div>
                     <p>
                       早退≤
                       <el-input
-                        v-model="scope.row.timesUpperLimit"
+                        v-model="scope.row.periodUpperLimit"
                         class="inputInfo"
 
+                        value="30"
                         @input.native="handleInput($event)"
-                      />次，每次扣款
+                      />分钟，每次扣款
                       <el-input
-                        v-model="scope.row.dedAmonutUpperLimit"
+                        v-model="scope.row.dedPeriodUpper"
                         class="inputInfo"
 
-                        @input.native="handleInput($event)"
-                      />元
-                    </p>
-                    <p>
-                      早退>
-                      <el-input v-model="scope.row.timesLowerLimit" class="inputInfo" disabled />次，每次扣款
-                      <el-input
-                        v-model="scope.row.dedAmonutLowerLimit"
-                        class="inputInfo"
                         @input.native="handleInput($event)"
                       />元
                     </p>
                   </div>
-                  <p>
-                    早退>
-                    <el-input v-model="scope.row.periodLowerLimit" class="inputInfo" disabled />分钟
-                  </p>
-                  <div style="padding-left:120px;">
+
+                  <div>
                     <p>
                       早退>
+                      <el-input v-model="scope.row.periodLowerLimit" class="inputInfo" disabled />分钟，每次扣款
                       <el-input
-                        v-model="scope.row.absenceTimesUpperLimt"
-                        class="inputInfo"
-                        disabled
-                      />次，每次矿工
-                      <el-input
-                        v-model="scope.row.absenceDays"
+                        v-model="scope.row.dedPeriodLower"
                         class="inputInfo"
                         @input.native="handleInputPoint($event)"
-                      />天
+                      />元
                     </p>
                   </div>
                 </div>
@@ -193,7 +137,7 @@
                       v-model="scope.row.dedAbsence"
                       class="inputInfo"
                       @input.native="handleInput($event)"
-                    />元一天
+                    />元
                   </p>
                 </div>
               </template>
