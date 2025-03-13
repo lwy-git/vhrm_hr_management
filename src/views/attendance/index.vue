@@ -151,10 +151,11 @@
               v-model="form.checkoutTime"
               placeholder="选择时间"
               value-format="HH:mm:ss"
+              @change="changeStatus"
             />
           </el-form-item>
           <el-form-item label="考勤状态" prop="status">
-            <el-select v-model="form.status">
+            <el-select v-model="form.status" disabled>
               <el-option
                 v-for="item in statusOptions"
                 :key="item.value"
@@ -185,6 +186,7 @@ import {
   addAttendance,
   updateAttendance,
   getAttendanceDetail,
+  getAttendanceConfig,
   deleteAttendance
 } from '@/api/attendance'
 import { getEmployeeList } from '@/api/employee'
@@ -203,15 +205,6 @@ export default {
       },
       total: 0,
       attendanceList: [
-        // {
-        //   id: 1,
-        //   employeeName: '张三',
-        //   attendanceDate: '2024-01-10',
-        //   checkInTime: '09:00:00',
-        //   checkOutTime: '18:00:00',
-        //   status: 1,
-        //   remark: '正常出勤'
-        // }
       ],
       dialogVisible: false,
       dialogTitle: '',
@@ -220,17 +213,15 @@ export default {
         NORMAL: 1, // 正常
         LATE: 2, // 迟到
         EARLY: 3, // 早退
-        ABSENT: 4, // 旷工
-        OUTSIDE: 5, // 外勤
-        LEAVE: 6 // 请假
+        ABSENT: 4// 旷工
       },
       statusOptions: [
         { value: 1, label: '正常' },
         { value: 2, label: '迟到' },
         { value: 3, label: '早退' },
-        { value: 4, label: '旷工' },
-        { value: 5, label: '外勤' },
-        { value: 6, label: '请假' }
+        { value: 4, label: '旷工' }
+        // { value: 5, label: '外勤' },
+        // { value: 6, label: '请假' }
       ],
       employeeList: [],
       isEmployeeDisabled: false, // 控制员工选择框禁用
@@ -268,6 +259,59 @@ export default {
     this.getEmployeeList()
   },
   methods: {
+    async changeStatus() {
+      const { checkinTime, checkoutTime } = this.form
+      console.log('checkinTime', checkinTime)
+      console.log('checkoutTime', checkoutTime)
+
+      // 假设早晨开始时间和下午结束时间是固定的
+      const res = await getAttendanceConfig()
+      console.log('res', res)
+      const morningStartTime = res.morningStartTime // 早晨开始时间，如 "09:00"
+      const afternoonEndTime = res.afternoonEndTime // 下午结束时间，如 "18:00"
+
+      // 判断考勤状态
+      const status = this.calculateAttendanceStatus(morningStartTime, afternoonEndTime, checkinTime, checkoutTime)
+      console.log('status', status)
+      this.form.status = status // 更新考勤状态
+    },
+
+    // 计算考勤状态
+    calculateAttendanceStatus(morningStartTime, afternoonEndTime, checkinTime, checkoutTime) {
+      const morningStart = this.parseTimeWithSeconds(morningStartTime)
+      const afternoonEnd = this.parseTimeWithSeconds(afternoonEndTime)
+      const checkin = this.parseTimeWithSeconds(checkinTime)
+      const checkout = this.parseTimeWithSeconds(checkoutTime)
+
+      // 如果没有签到时间或者签退时间，视为旷工
+      if (!checkin || !checkout) {
+        return 4 // 旷工
+      }
+
+      // 判断迟到
+      if (checkin.getTime() > morningStart.getTime()) {
+        return 2 // 迟到
+      }
+
+      // 判断早退
+      if (checkout.getTime() < afternoonEnd.getTime()) {
+        return 3 // 早退
+      }
+
+      // 正常考勤
+      return 1 // 正常
+    },
+
+    // 时间解析方法，处理包含秒钟部分的时间
+    parseTimeWithSeconds(timeStr) {
+      if (timeStr) {
+        const [hours, minutes, seconds = '00'] = timeStr.split(':') // 默认为 '00' 秒
+        // 将解析后的时间转换为当天的时间 (1970年1月1日的时间)
+        return new Date(1970, 0, 1, Number(hours), Number(minutes), Number(seconds))
+      }
+      return null
+    },
+
     handleDataSearch() {
       this.getAttendanceList()
     },
