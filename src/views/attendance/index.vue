@@ -214,15 +214,15 @@ export default {
         NORMAL: 1, // 正常
         LATE: 2, // 迟到
         EARLY: 3, // 早退
-        ABSENT: 4, // 旷工
-        LATEANDEARLY: 5// 迟到且早退
+        ABSENT: 4 // 旷工
+        // LATEANDEARLY: 5// 迟到且早退
       },
       statusOptions: [
         { value: 1, label: '正常' },
         { value: 2, label: '迟到' },
         { value: 3, label: '早退' },
-        { value: 4, label: '旷工' },
-        { value: 5, label: '迟到且早退' }
+        { value: 4, label: '旷工' }
+        // { value: 5, label: '迟到且早退' }
         // { value: 6, label: '请假' }
       ],
       employeeList: [],
