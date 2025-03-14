@@ -137,6 +137,7 @@
               type="date"
               placeholder="选择日期"
               value-format="yyyy-MM-dd"
+              @change="changeStatus"
             />
           </el-form-item>
           <el-form-item label="签到时间" prop="checkinTime">
@@ -213,14 +214,15 @@ export default {
         NORMAL: 1, // 正常
         LATE: 2, // 迟到
         EARLY: 3, // 早退
-        ABSENT: 4// 旷工
+        ABSENT: 4, // 旷工
+        LATEANDEARLY: 5// 迟到且早退
       },
       statusOptions: [
         { value: 1, label: '正常' },
         { value: 2, label: '迟到' },
         { value: 3, label: '早退' },
-        { value: 4, label: '旷工' }
-        // { value: 5, label: '外勤' },
+        { value: 4, label: '旷工' },
+        { value: 5, label: '迟到且早退' }
         // { value: 6, label: '请假' }
       ],
       employeeList: [],
@@ -242,12 +244,12 @@ export default {
         attendanceDate: [
           { required: true, message: '请选择考勤日期', trigger: 'blur' }
         ],
-        checkinTime: [
-          { required: true, message: '请选择签到时间', trigger: 'blur' }
-        ],
-        checkoutTime: [
-          { required: true, message: '请选择签退时间', trigger: 'blur' }
-        ],
+        // checkinTime: [
+        //   { required: true, message: '请选择签到时间', trigger: 'blur' }
+        // ],
+        // checkoutTime: [
+        //   { required: true, message: '请选择签退时间', trigger: 'blur' }
+        // ],
         status: [
           { required: true, message: '请选择考勤状态', trigger: 'change' }
         ]
@@ -264,7 +266,6 @@ export default {
       console.log('checkinTime', checkinTime)
       console.log('checkoutTime', checkoutTime)
 
-      // 假设早晨开始时间和下午结束时间是固定的
       const res = await getAttendanceConfig()
       console.log('res', res)
       const morningStartTime = res.morningStartTime // 早晨开始时间，如 "09:00"
@@ -287,7 +288,9 @@ export default {
       if (!checkin || !checkout) {
         return 4 // 旷工
       }
-
+      // if (checkin.getTime() > morningStart.getTime() && checkout.getTime() < afternoonEnd.getTime()) {
+      //   return 5// 迟到且早退
+      // }
       // 判断迟到
       if (checkin.getTime() > morningStart.getTime()) {
         return 2 // 迟到
@@ -372,9 +375,8 @@ export default {
         [this.attendanceStatus.NORMAL]: 'success',
         [this.attendanceStatus.LATE]: 'warning',
         [this.attendanceStatus.EARLY]: 'warning',
-        [this.attendanceStatus.ABSENT]: 'danger',
-        [this.attendanceStatus.OUTSIDE]: 'info',
-        [this.attendanceStatus.LEAVE]: 'info'
+        [this.attendanceStatus.ABSENT]: 'danger'
+        // [this.attendanceStatus.LATEANDEARLY]: 'danger'
       }
       return typeMap[status] || ''
     },
