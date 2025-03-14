@@ -48,7 +48,7 @@ export default {
       // this.$refs.属性名 和 this.$refs[属性名] 等价
       this.$refs['excel-upload-input'].click()
     },
-    uploadChange(event) {
+    async uploadChange(event) {
       console.log('event.target.files', event.target.files)
       // 调用上传接口
       const files = event.target.files // input的文件列表
@@ -59,9 +59,10 @@ export default {
         data.append('file', files[0]) // 将文件参数加入到formData中
         try {
           // 调用上传接口
-          uploadExcel(data) // 参数  form-data 需要文件file
+          const res = await uploadExcel(data) // 参数  form-data 需要文件file
           this.$emit('uploadSuccess')// 通知父组件上传成功
-          this.$message.success('excel导入成功')
+          console.log('res', res)
+          this.$message.success(res)
           this.$emit('update:showExcelDialog', false) // 关闭对话框
         // eslint-disable-next-line no-empty
         } catch (error) {

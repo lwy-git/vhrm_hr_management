@@ -19,14 +19,14 @@ export function getAllEmployee() {
 
 export function exportEmployee() {
   return request({
-    url: '/sys/user/export',
+    url: '/exportEmpData',
     responseType: 'blob' // 使用blob接收二进制文件流
   })
 }
 // 下载导入模板
 export function getExportTemplate() {
   return request({
-    url: '/sys/user/import/template',
+    url: '/downloadEmpTemplate',
     responseType: 'blob'
   })
 }
@@ -35,7 +35,7 @@ export function getExportTemplate() {
 
 export function uploadExcel(data) {
   return request({
-    url: '/sys/user/import',
+    url: '/importEmpData',
     method: 'post',
     data // form-data类型 因为要上传文件类型
   })
