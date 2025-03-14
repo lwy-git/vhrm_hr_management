@@ -37,7 +37,7 @@
               </div>
               <div class="data-content">
                 <div class="data-title">平均薪资</div>
-                <div class="data-number">{{ dashboardData.averageSalary }}</div>
+                <div class="data-number">{{ dashboardData.averageSalary.toFixed(2) }}</div>
               </div>
             </div>
           </el-card>
@@ -50,7 +50,7 @@
               </div>
               <div class="data-content">
                 <div class="data-title">平均绩效评分</div>
-                <div class="data-number">{{ dashboardData.averagePerformanceScore }}分</div>
+                <div class="data-number">{{ dashboardData.averagePerformanceScore.toFixed(2) }}分</div>
               </div>
             </div>
           </el-card>
