@@ -69,3 +69,10 @@ export function calculateDeduction(params) {
     params
   })
 }
+// 计算每月奖金calculateFullAttendanceBonus
+export function calculateFullAttendanceBonus(params) {
+  return request({
+    url: `/attendanceConfig/calculateFullAttendanceBonus`,
+    params
+  })
+}

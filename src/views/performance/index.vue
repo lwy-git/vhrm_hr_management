@@ -265,7 +265,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="出勤情况" prop="attendanceScore">
+              <el-form-item label="创新能力" prop="attendanceScore">
                 <el-input
                   v-model.number="performanceForm.attendanceScore"
                   placeholder="请输入0-100的分数"

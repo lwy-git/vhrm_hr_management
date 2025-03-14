@@ -148,6 +148,27 @@
             <el-button @click="handleClose">取消</el-button>
           </div>
         </el-tab-pane>
+        <el-tab-pane label="奖金设置" name="four">
+          <el-form
+            ref="dataForm"
+            :rules="rules"
+            :model="formBase"
+            label-width="150px"
+            style="width:450px;"
+            class="titmInfo"
+          >
+            <el-form-item label="全勤奖金额：" prop="attendceBonus">
+              <el-input
+                v-model="formBase.attendceBonus"
+                placeholder="请输入全勤奖金额"
+              />
+            </el-form-item>
+          </el-form>
+          <div class="el-dialog__footer dialog-footer">
+            <el-button type="primary" @click="handleBonusSave">保存更新</el-button>
+            <el-button @click="handleClose">取消</el-button>
+          </div>
+        </el-tab-pane>
       </el-tabs>
     </el-dialog>
   </div>
@@ -171,10 +192,10 @@ export default {
       activeName: 'first',
       formBase: {
         morningStartTime: '',
-        afternoonEndTime: ''
+        afternoonEndTime: '',
+        attendceBonus: ''
       },
       deductionsBase: {},
-      departmentData: [],
       stateData: [],
       oldNum: '',
       rules: {
@@ -183,6 +204,9 @@ export default {
         ],
         afternoonEndTime: [
           { required: true, message: '请选择下午结束时间', trigger: 'change' }
+        ],
+        attendceBonus: [
+          { required: true, message: '请输入全勤奖金额', trigger: 'blur' }
         ]
       }
     }
@@ -203,6 +227,7 @@ export default {
 
       this.formBase.morningStartTime = res.morningStartTime
       this.formBase.afternoonEndTime = res.afternoonEndTime
+      this.formBase.attendceBonus = res.attendceBonus
       console.log('this.formBase.morningStartTime', this.formBase.morningStartTime)
       const resData = await getstateData()
       this.stateData = resData
@@ -222,6 +247,16 @@ export default {
       // this.clearFormDate()
     },
     async handleAttendance() {
+      this.$refs.dataForm.validate(async valid => {
+        if (valid) {
+          const res = await attendanceSave(this.formBase)
+          this.$message.success(res)
+          this.$emit('dataSearch')
+          this.handleClose()
+        }
+      })
+    },
+    async handleBonusSave() {
       this.$refs.dataForm.validate(async valid => {
         if (valid) {
           const res = await attendanceSave(this.formBase)

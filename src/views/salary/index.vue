@@ -158,18 +158,40 @@
               v-model="salaryForm.bonus"
               :min="0"
               :precision="2"
+              disabled
               :step="100"
               @change="calculateActualSalary"
             />
+            <el-tooltip content="根据考勤情况核算奖金" placement="top" effect="light">
+              <i
+                class="el-icon-question"
+                style="margin-left: 10px;
+                                  cursor: pointer;
+                                  font-size: 20px;
+                                  color:#E6A23C;
+                                 "
+              />
+            </el-tooltip>
           </el-form-item>
           <el-form-item label="扣款" prop="deduction">
             <el-input-number
               v-model="salaryForm.deduction"
               :min="0"
               :precision="2"
+              disabled
               :step="100"
               @change="calculateActualSalary"
             />
+            <el-tooltip content="根据考勤情况核算扣款" placement="top" effect="light">
+              <i
+                class="el-icon-question"
+                style="margin-left: 10px;
+                                  cursor: pointer;
+                                  font-size: 20px;
+                                  color:#E6A23C;
+                                 "
+              />
+            </el-tooltip>
           </el-form-item>
           <el-form-item label="实发工资" prop="actualSalary">
             <el-input v-model.number="salaryForm.actualSalary" disabled />
@@ -233,7 +255,7 @@ import {
   deleteSalary,
   getSalaryDetail
 } from '@/api/salary'
-import { calculateDeduction } from '@/api/attendance'
+import { calculateDeduction, calculateFullAttendanceBonus } from '@/api/attendance'
 import { getEmployeeList } from '@/api/employee'
 import { getPerformanceList } from '@/api/performance'
 export default {
@@ -373,8 +395,11 @@ export default {
         this.salaryForm.level = records[0].level
         const res = await calculateDeduction({ employeeId: this.salaryForm.employeeId, month: this.salaryForm.month })
         console.log('res', res)
-
         this.salaryForm.deduction = res
+
+        const res1 = await calculateFullAttendanceBonus({ employeeId: this.salaryForm.employeeId, month: this.salaryForm.month })
+        console.log('res1', res1)
+        this.salaryForm.bonus = res1
       }
     },
     // 搜索
