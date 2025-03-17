@@ -5,7 +5,7 @@
       <el-table :data="permissionsList" style="margin-top: 30px; margin-left: 10px;">
         <el-table-column align="center" prop="name" label="名称" />
         <el-table-column align="center" prop="code" label="标识" />
-        <el-table-column align="center" prop="enVisible" label="描述">
+        <el-table-column align="center" prop="enVisible" label="状态">
           <template slot-scope="scope">
             <el-tag :type="getTagType(scope.row.enVisible)">{{ scope.row.enVisible?"启用":"停用" }}</el-tag>
           </template>

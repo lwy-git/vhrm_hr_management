@@ -8,7 +8,7 @@ export default {
     name: 'performance',
     component: () => import('@/views/performance'),
     meta: {
-      title: '绩效',
+      title: '绩效评估',
       icon: 'table'
     }
   }]

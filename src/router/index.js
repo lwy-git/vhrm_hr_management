@@ -62,12 +62,12 @@ export const constantRoutes = [
     path: '/mySalary',
     component: Layout,
     children: [{
-      path: 'mySalary',
+      path: '',
       name: 'mySalary',
       component: () => import('@/views/mySalary'),
       meta: {
         title: '我的工资',
-        icon: 'lock'
+        icon: 'chart'
       }
     }]
   },
@@ -75,12 +75,12 @@ export const constantRoutes = [
     path: '/myApply',
     component: Layout,
     children: [{
-      path: 'myApply',
+      path: '',
       name: 'myApply',
       component: () => import('@/views/myApply'),
       meta: {
         title: '我的申请',
-        icon: 'lock'
+        icon: 'edit'
       }
     }]
   },
@@ -88,12 +88,12 @@ export const constantRoutes = [
     path: '/myPerformance',
     component: Layout,
     children: [{
-      path: 'myPerformance',
+      path: '',
       name: 'myPerformance',
       component: () => import('@/views/myPerformance'),
       meta: {
         title: '我的绩效',
-        icon: 'lock'
+        icon: 'star'
       }
     }]
   }

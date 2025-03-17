@@ -306,7 +306,7 @@ export default {
           img.src = 'data:image/jpeg;base64,' + base64 // 更新验证码图片
         })
         .catch(function(error) {
-          console.error('Error fetching captcha image:', error)
+          console.error('验证码错误:', error)
           this.loadCaptcha(0)
         })
     },
@@ -324,7 +324,7 @@ export default {
   height: 100vh;
   .logo {
     flex: 3;
-    background: rgba(38, 72, 176) url(../../assets/common/changli.jpg) no-repeat
+    background: rgba(38, 72, 176) url(../../assets/common/bg5.jpg) no-repeat
       center / cover;
     border-top-right-radius: 60px;
     display: flex;
@@ -332,13 +332,6 @@ export default {
     align-items: flex-end;
     justify-content: center;
     padding: 0 100px;
-    .icon {
-      background: url(../../assets/common/logo.png) no-repeat 70px center /
-        contain;
-      width: 300px;
-      height: 50px;
-      margin-bottom: 50px;
-    }
     p {
       color: #fff;
       font-size: 18px;

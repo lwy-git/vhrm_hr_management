@@ -8,7 +8,7 @@ export default {
     name: 'attendance',
     component: () => import('@/views/attendance'),
     meta: {
-      title: '考勤',
+      title: '考勤管理',
       icon: 'excel'
     }
   }]

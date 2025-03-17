@@ -11,7 +11,7 @@ export default {
     meta: {
       // 路由元信息 存储数据的
       icon: 'tree', // 图标
-      title: '组织' // 标题
+      title: '组织架构' // 标题
     }
   }]
 }

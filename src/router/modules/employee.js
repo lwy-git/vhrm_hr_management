@@ -8,7 +8,7 @@ export default {
     name: 'employee',
     component: () => import('@/views/employee'),
     meta: {
-      title: '员工',
+      title: '员工管理',
       icon: 'people'
     }
   }, {

@@ -277,7 +277,11 @@ export default {
       this.currentRoleId = id
       const { permIds } = await getRoleDetail(id)
       this.permIds = permIds
-      const { records } = await getPermissionList(this.pageParams)
+      const { records } = await getPermissionList({
+        page: 1, // 第几页
+        pagesize: 10, // 每页多少条
+        enVisible: 1
+      })
       this.permissionData = records
       this.showPermissionDialog = true
     },
