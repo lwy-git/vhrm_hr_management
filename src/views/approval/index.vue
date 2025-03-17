@@ -118,48 +118,73 @@
         />
       </el-row>
 
-      <!-- 审批详情对话框 -->
-      <el-dialog title="审批详情" :visible.sync="dialogVisible" width="500px">
-        <el-descriptions :column="1" border>
-          <el-descriptions-item label="申请时间">{{
-            currentRow.applyTime
-          }}</el-descriptions-item>
-          <el-descriptions-item label="申请人">{{
-            currentRow.applicant
-          }}</el-descriptions-item>
-          <el-descriptions-item label="申请类型">{{
-            currentRow.type === "leave"
-              ? "请假"
-              : currentRow.type === "overtime"
-                ? "加班"
-                : currentRow.type === "dimission"
-                  ? "离职"
-                  : "其他"
+      <el-dialog title="审批详情" :visible.sync="dialogVisible" width="800px">
+        <div v-if="currentRow" class="approval-details">
+          <!-- 使用el-row和el-col布局来确保每行显示两个信息 -->
+          <el-row :gutter="20">
+            <!-- 申请时间 -->
+            <el-col :span="12">
+              <div class="approval-item">
+                <span class="label">申请时间:</span>
+                <span class="value">{{ currentRow.applyTime }}</span>
+              </div>
+            </el-col>
 
-          }}</el-descriptions-item>
-          <el-descriptions-item label="申请原因">{{
-            currentRow.reason
-          }}</el-descriptions-item>
+            <!-- 申请人 -->
+            <el-col :span="12">
+              <div class="approval-item">
+                <span class="label">申请人:</span>
+                <span class="value">{{ currentRow.applicant }}</span>
+              </div>
+            </el-col>
+          </el-row>
 
-          <el-descriptions-item label="状态" style="margin-left: 10px;">
-            <el-tag
-              v-if="currentRow.status === 'pending'"
-              type="info"
-            >待审批</el-tag>
-            <el-tag
-              v-if="currentRow.status === 'approved'"
-              type="success"
-            >已通过</el-tag>
-            <el-tag
-              v-if="currentRow.status === 'rejected'"
-              type="danger"
-            >已拒绝</el-tag>
-            <el-tag
-              v-if="currentRow.status === 'callbacked'"
-              type="warning"
-            >已撤销</el-tag>
-          </el-descriptions-item>
-        </el-descriptions>
+          <el-row :gutter="20">
+            <!-- 申请类型 -->
+            <el-col :span="12">
+              <div class="approval-item">
+                <span class="label">申请类型:</span>
+                <span class="value">
+                  {{ currentRow.type === "leave"
+                    ? "请假"
+                    : currentRow.type === "overtime"
+                      ? "加班"
+                      : currentRow.type === "resignation"
+                        ? "离职"
+                        : "其他" }}
+                </span>
+              </div>
+            </el-col>
+
+            <!-- 申请原因 -->
+            <el-col :span="12">
+              <div class="approval-item">
+                <span class="label">申请原因:</span>
+                <span class="value">{{ currentRow.reason }}</span>
+              </div>
+            </el-col>
+          </el-row>
+
+          <el-row :gutter="20">
+            <!-- 状态 -->
+            <el-col :span="12">
+              <div class="approval-item">
+                <span class="label">状态:</span>
+                <span class="value">
+                  <el-tag v-if="currentRow.status === 'pending'" type="info">待审批</el-tag>
+                  <el-tag v-if="currentRow.status === 'approved'" type="success">已通过</el-tag>
+                  <el-tag v-if="currentRow.status === 'rejected'" type="danger">已拒绝</el-tag>
+                  <el-tag v-if="currentRow.status === 'callbacked'" type="warning">已撤销</el-tag>
+                </span>
+              </div>
+            </el-col>
+          </el-row>
+        </div>
+
+        <!-- 底部按钮 -->
+        <template #footer>
+          <el-button size="small" @click="dialogVisible = false">关闭</el-button>
+        </template>
       </el-dialog>
     </div>
   </div>
@@ -173,6 +198,7 @@ import {
   delApproval,
   getApprovalDetail
 } from '@/api/approval'
+import { delEmployee } from '@/api/employee'
 export default {
   name: 'Approvals',
   data() {
@@ -243,6 +269,10 @@ export default {
         // TODO: 调用接口处理审批通过
         await approveApplication(row)
         this.$message.success('审批通过成功')
+        // 如果是离职申请，审批通过就删除员工
+        if (row.type === 'resignation') {
+          await delEmployee(row.applicantId)
+        }
         this.getApprovalList()
       } catch (error) {
         console.error('审批通过失败:', error)
@@ -343,6 +373,28 @@ export default {
       font-size: 12px;
       display:inline-block;
     }
+  }
+  .approval-details {
+    padding: 20px;
+  }
+
+  .approval-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px; /* 增加上下项之间的间距 */
+    padding: 10px; /* 给每个项增加内边距 */
+    border-radius: 5px; /* 增加圆角效果 */
+    background-color: #f9f9f9; /* 背景色 */
+  }
+
+  .approval-item .label {
+    font-weight: bold;
+    width: 100px;
+    margin-right: 10px; /* 增加标签和内容之间的间距 */
+  }
+
+  .approval-item .value {
+    color: #333;
   }
 }
 
