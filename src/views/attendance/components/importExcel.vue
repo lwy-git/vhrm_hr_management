@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     width="500px"
-    title="员工导入"
+    title="考勤信息导入"
     :visible="showExcelDialog"
     @close="$emit('update:showExcelDialog', false)"
   >
@@ -34,7 +34,7 @@
   </el-dialog>
 </template>
 <script>
-import { uploadExcel, getExportTemplate } from '@/api/employee'
+import { uploadAttendanceExcel, getAttendanceTemplate } from '@/api/attendance'
 import FileSaver from 'file-saver'
 export default {
   props: {
@@ -64,7 +64,6 @@ export default {
         this.uploadChange({ target: { files }})
       }
     },
-
     btnUpload() {
       // this.$refs.属性名 和 this.$refs[属性名] 等价
       this.$refs['excel-upload-input'].click()
@@ -80,7 +79,7 @@ export default {
         data.append('file', files[0]) // 将文件参数加入到formData中
         try {
           // 调用上传接口
-          const res = await uploadExcel(data) // 参数  form-data 需要文件file
+          const res = await uploadAttendanceExcel(data) // 参数  form-data 需要文件file
           this.$emit('uploadSuccess')// 通知父组件上传成功
           console.log('res', res)
           this.$message.success(res)
@@ -94,8 +93,8 @@ export default {
       }
     },
     async downLoadTemplate() {
-      const data = await getExportTemplate()
-      FileSaver.saveAs(data, '员工导入模版.xlsx')
+      const data = await getAttendanceTemplate()
+      FileSaver.saveAs(data, '考勤导入模版.xlsx')
     }
   }
 }
@@ -134,8 +133,8 @@ export default {
       display: block;
       color: #c0c4cc;
     }
-    /* 调整按钮样式，避免点击区域重叠 */
-    el-button {
+     /* 调整按钮样式，避免点击区域重叠 */
+     el-button {
       padding: 0 10px;
     }
   }

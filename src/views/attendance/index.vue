@@ -56,6 +56,7 @@
             type="primary"
             @click="handleSet"
           >考勤设置</el-button>
+          <el-button size="mini" @click="showExcelDialog = true">考勤导入</el-button>
           <el-button size="mini" @click="handleExport">导出考勤</el-button>
         </el-row>
 
@@ -174,6 +175,8 @@
           <el-button type="primary" @click="submitForm">确 定</el-button>
         </div>
       </el-dialog>
+      <!-- excel导入弹层 .sync双向绑定数据控制弹窗显隐  uploadSuccess监听上传成功-->
+      <ImportExcel :show-excel-dialog.sync="showExcelDialog" @uploadSuccess="getAttendanceList" />
       <!-- 设置组件 -->
       <attendance-set ref="set" @handleCloseModal="handleCloseModal" @dataSearch="handleDataSearch" />
     </div>
@@ -191,13 +194,17 @@ import {
   deleteAttendance
 } from '@/api/attendance'
 import { getEmployeeList } from '@/api/employee'
+import { exportAttendance } from '@/api/attendance'
+import FileSaver from 'file-saver'
+import ImportExcel from './components/importExcel.vue'
 // import { parseTime } from '@/utils'
 
 export default {
   name: 'Attendance',
-  components: { AttendanceSet },
+  components: { AttendanceSet, ImportExcel },
   data() {
     return {
+      showExcelDialog: false, // 控制excel的弹层显示和隐藏
       queryParams: {
         keyword: '',
         status: '',
@@ -426,12 +433,11 @@ export default {
         .catch(() => {})
     },
     // 导出考勤
-    handleExport() {
-      const params = { ...this.queryParams }
-      window.location.href =
-        process.env.VUE_APP_BASE_API +
-        '/attendance/export?' +
-        this.queryString(params)
+    async  handleExport() {
+      const result = await exportAttendance() // 导出所有的考勤接口
+      // console.log(result) // 使用一个npm包 直接将blob文件下载到本地 file-saver
+      // FileSaver.saveAs(blob对象,文件名称)
+      FileSaver.saveAs(result, '考勤信息表.xlsx') // 下载文件
     },
     // 提交表单
     submitForm() {

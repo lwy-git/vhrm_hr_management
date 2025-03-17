@@ -76,3 +76,27 @@ export function calculateFullAttendanceBonus(params) {
     params
   })
 }
+// 考勤导出
+export function exportAttendance() {
+  return request({
+    url: '/exportAttendanceData',
+    responseType: 'blob' // 使用blob接收二进制文件流
+  })
+}
+
+// 下载考勤导入模板
+export function getAttendanceTemplate() {
+  return request({
+    url: '/downloadAttendanceTemplate',
+    responseType: 'blob'
+  })
+}
+
+// 考勤导入
+export function uploadAttendanceExcel(data) {
+  return request({
+    url: '/importAttendanceData',
+    method: 'post',
+    data // form-data类型 因为要上传文件类型
+  })
+}
