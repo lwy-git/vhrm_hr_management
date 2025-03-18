@@ -105,6 +105,7 @@
           <el-row type="flex">
             <el-col :span="12" style="margin-left: 220px">
               <el-button size="mini" type="primary" @click="saveData">保存更新</el-button>
+              <el-button size="mini" type="primary" @click="goBack">取消</el-button>
             </el-col>
           </el-row>
         </el-form>
@@ -194,6 +195,9 @@ export default {
     this.getDepartment()
   },
   methods: {
+    goBack() {
+      this.$router.push('/employee')
+    },
     async getDepartment() {
       this.departmentList = await getDepartment()
     },

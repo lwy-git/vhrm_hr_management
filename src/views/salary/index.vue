@@ -399,7 +399,11 @@ export default {
 
         const res1 = await calculateFullAttendanceBonus({ employeeId: this.salaryForm.employeeId, month: this.salaryForm.month })
         console.log('res1', res1)
-        this.salaryForm.bonus = res1
+        if (res1 !== '无法获得全勤奖') {
+          this.salaryForm.bonus = res1
+        } else {
+          this.salaryForm.bonus = 0
+        }
       }
     },
     // 搜索
@@ -524,9 +528,12 @@ export default {
     },
     // 计算实发工资
     calculateActualSalary() {
-      const { baseSalary = 0, performanceSalary = 0, bonus = 0, deduction = 0 } = this.salaryForm
+      const { baseSalary, performanceSalary, bonus, deduction } = this.salaryForm
+      console.log('this.salaryForm', this.salaryForm)
+
       this.salaryForm.actualSalary =
         Number(baseSalary) + Number(performanceSalary) + Number(bonus) - Number(deduction)
+      console.log('this.salaryForm.actualSalary', this.salaryForm.actualSalary)
       this.salaryForm.actualSalary = parseFloat(this.salaryForm.actualSalary).toFixed(2)
     }
   }

@@ -49,7 +49,7 @@
           <el-table-column prop="formOfEmployment" label="聘用形式">
             <template v-slot="{ row }">
               <span> {{
-                row.formOfEmployment=== 1 ? "正式" : row.formOfEmployment === 0 ? "非正式" : "无"
+                row.formOfEmployment=== 1 ? "正式" : row.formOfEmployment === 2 ? "非正式" : "无"
               }}</span>
             </template>
           </el-table-column>
