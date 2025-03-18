@@ -415,6 +415,13 @@ export default {
       const attendanceData = await getAttendanceDetail(row.id)
       console.log('attendanceData: ', attendanceData)
       this.form = attendanceData
+      if (this.isEmployeeDisabled === true) {
+        const employee = this.employeeList.find(item => item.username === this.form.employeeName)
+        if (employee) {
+          this.form.employeeId = employee.id
+          console.log(111)
+        }
+      }
     },
     // 删除考勤
     handleDelete(id) {
