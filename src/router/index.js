@@ -133,7 +133,7 @@ export const asyncRoutes = [
   // socialRouter
 ]
 const createRouter = () => new Router({
-  // mode: 'history',
+  mode: 'history',
   scrollBehavior: () => ({ y: 0 }),
   // 指定当切换路由时页面滚动的位置，这里设置为让页面在垂直方向（y轴）滚动到坐标0的位置，也就是滚动到顶部
   routes: constantRoutes // 默认引入静态路由
