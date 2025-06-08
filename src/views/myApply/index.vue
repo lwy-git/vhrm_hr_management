@@ -23,38 +23,38 @@
           size="small"
           style="width: 200px; margin-right: 10px"
         >
-          <el-option label="请假" value="leave" />
-          <el-option label="加班" value="overtime" />
-          <el-option label="离职" value="resignation" />
+          <el-option label="请假" value="0" />
+          <el-option label="加班" value="1" />
+          <el-option label="离职" value="2" />
         </el-select>
         <el-button size="small" type="primary" @click="handleSearch">搜索</el-button>
         <el-button size="small" @click="handleReset">重置</el-button>
-        <el-button type="primary" size="small" style="float: right" @click="showApplicationDialog">新建申请</el-button>
+        <el-button type="primary" size="small" style="float: right" @click="showApplicationDialog">提交申请</el-button>
       </div>
 
       <!-- 我的申请列表 -->
       <el-table v-loading="loading" :data="myApplications" style="margin-top: 20px;margin-left: 20px;">
         <el-table-column prop="type" label="申请类型">
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.type === 'leave'">请假</el-tag>
-            <el-tag v-if="scope.row.type === 'overtime'" type="warning">加班</el-tag>
-            <el-tag v-if="scope.row.type === 'resignation'" type="danger">离职</el-tag>
+            <el-tag v-if="scope.row.type === 0">请假</el-tag>
+            <el-tag v-if="scope.row.type === 1" type="warning">加班</el-tag>
+            <el-tag v-if="scope.row.type === 2" type="danger">离职</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="reason" label="申请原因" />
         <el-table-column prop="applyTime" label="申请时间" />
         <el-table-column prop="status" label="状态">
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.status === 'pending'" type="info">待审批</el-tag>
-            <el-tag v-if="scope.row.status === 'approved'" type="success">已通过</el-tag>
-            <el-tag v-if="scope.row.status === 'rejected'" type="danger">已拒绝</el-tag>
-            <el-tag v-if="scope.row.status === 'callbacked'" type="warning">已撤销</el-tag>
+            <el-tag v-if="scope.row.status === 0" type="info">待审批</el-tag>
+            <el-tag v-if="scope.row.status === 1" type="success">已通过</el-tag>
+            <el-tag v-if="scope.row.status === 2" type="danger">已拒绝</el-tag>
+            <el-tag v-if="scope.row.status === 3" type="warning">已撤销</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="200">
           <template slot-scope="scope">
             <el-button
-              v-if="scope.row.status === 'pending'"
+              v-if="scope.row.status === 0"
               type="text"
               size="mini"
               @click="handleCallBack(scope.row)"
@@ -81,9 +81,9 @@
         <el-form ref="applicationForm" :model="applicationForm" :rules="rules" label-width="100px">
           <el-form-item label="申请类型" prop="type">
             <el-select v-model="applicationForm.type" placeholder="请选择申请类型" style="width: 100%">
-              <el-option label="请假" value="leave" />
-              <el-option label="加班" value="overtime" />
-              <el-option label="离职" value="resignation" />
+              <el-option label="请假" value="0" />
+              <el-option label="加班" value="1" />
+              <el-option label="离职" value="2" />
             </el-select>
           </el-form-item>
           <el-form-item label="申请时间" prop="applyTime">
@@ -134,7 +134,7 @@ export default {
         reason: '',
         applicantId: store.getters.Id,
         applicant: store.getters.name,
-        status: 'pending',
+        status: 0,
         applyTime: ''
       },
       rules: {
@@ -167,7 +167,7 @@ export default {
         reason: '',
         applicantId: store.getters.Id,
         applicant: store.getters.name,
-        status: 'pending',
+        status: 0,
         applyTime: ''
       }
     },
@@ -203,7 +203,7 @@ export default {
     },
 
     // 当前页改变
-    handleCurrentChange(val) {
+    changePage(val) {
       this.queryParams.page = val
       this.getApprovalList()
     },

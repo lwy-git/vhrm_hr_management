@@ -13,6 +13,19 @@ export function setToken(token) {
 export function removeToken() {
   return Cookies.remove(TokenKey)
 }
+const RoleKey = 'vue_admin_template_role'
+
+export function getRole() {
+  return Cookies.get(RoleKey)
+}
+
+export function setRole(role) {
+  return Cookies.set(RoleKey, role)
+}
+
+export function removeRole() {
+  return Cookies.remove(RoleKey)
+}
 const RoutesKey = 'vue_admin_template_routes'
 
 // 获取路由信息的函数

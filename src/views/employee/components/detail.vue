@@ -190,7 +190,7 @@ export default {
     }
   },
   created() {
-    // 点击详情时获取路由参数的中id，id存在获取详情数据
+    // 点击查看时获取路由参数的中id，id存在获取详情数据
     this.$route.params.id && this.getEmployeeDetail()
     this.getDepartment()
   },
@@ -209,11 +209,9 @@ export default {
             this.userInfo.departmentName = department.name
           }
           if (this.$route.params.id) {
-            // 有id是编辑更新
             await updateEmployee(this.userInfo)
             this.$message.success('更新员工成功')
           } else {
-            // 没有id是新增
             await addEmployee(this.userInfo)
             this.$message.success('新增员工成功')
           }
@@ -224,7 +222,6 @@ export default {
     },
     async getEmployeeDetail() {
       this.userInfo = await getEmployeeDetail(this.$route.params.id)
-      console.log(' this.userInfo ', this.userInfo)
     }
   }
 }

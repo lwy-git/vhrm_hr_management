@@ -4,6 +4,7 @@ const getters = {
   token: state => state.user.token,
   menus: state => state.user.menus,
   Id: state => state.user.userInfo.id,
+  role: state => state.user.role,
   avatar: state => state.user.userInfo.staffPhoto, // 头像
   name: state => state.user.userInfo.username,
   routes: state => state.user.routes, // 开放路由的访问信息

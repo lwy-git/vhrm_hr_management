@@ -1,4 +1,4 @@
-import { getToken, setToken, removeToken, getMenus, setMenus, removeMenus, getUserInfos, setUserInfo, removeUserInfo } from '@/utils/auth'
+import { getToken, setToken, removeToken, getMenus, setMenus, removeMenus, getUserInfos, setUserInfo, removeUserInfo, getRole, setRole, removeRole } from '@/utils/auth'
 import { login, getUserInfo, register } from '@/api/user'
 import { constantRoutes } from '@/router'
 import { resetRouter } from '@/router'
@@ -6,6 +6,7 @@ const state = {
   token: getToken(), // 从缓存读取token初始值
   userInfo: getUserInfos(),
   menus: getMenus(),
+  role: getRole(),
   routes: constantRoutes // 静态路由的数组
 }
 const mutations = {
@@ -39,6 +40,14 @@ const mutations = {
   setRoutes(state, asyncRoutes) {
     console.log('asyncRoutes', asyncRoutes)
     state.routes = [...constantRoutes, ...asyncRoutes] // 静态路由 + 动态路由
+  },
+  setRole(state, role) {
+    state.role = role
+    setRole(role)
+  },
+  removeRole(state) {
+    state.menus = null // 删除vuex中的menus
+    removeRole() // 退出时从缓存删除menus
   }
 }
 const actions = {
@@ -51,6 +60,7 @@ const actions = {
     context.commit('setToken', token.jwt)
     context.commit('setUserInfo', token.emp)
     context.commit('setMenus', token.menus)
+    context.commit('setRole', token.roleIds[0])
   },
   async register(context, data) {
     console.log(data)

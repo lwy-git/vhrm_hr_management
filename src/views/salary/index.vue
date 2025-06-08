@@ -24,7 +24,7 @@
           type="primary"
           size="small"
           @click="handleAdd"
-        >新增工资记录</el-button>
+        >新增薪酬记录</el-button>
       </div>
 
       <!-- 表格 -->
@@ -56,7 +56,7 @@
               type="text"
               size="small"
               @click="handleHistory(row)"
-            >历史工资</el-button>
+            >历史薪酬</el-button>
             <el-button
               type="text"
               size="small"
@@ -86,7 +86,7 @@
 
       <!-- 新增/编辑弹窗 -->
       <el-dialog
-        :title="operationType === 'add' ? '新增工资记录' : '编辑工资记录'"
+        :title="operationType === 'add' ? '新增薪酬记录' : '编辑薪酬记录'"
         :visible.sync="dialogVisible"
         width="500px"
       >
@@ -205,7 +205,7 @@
 
       <!-- 历史工资弹窗 -->
       <el-dialog
-        title="历史工资记录"
+        title="历史薪酬记录"
         :visible.sync="historyDialogVisible"
         width="800px"
       >
@@ -421,7 +421,7 @@ export default {
       this.getSalaryList()
     },
     // 分页
-    handleCurrentChange(val) {
+    changePage(val) {
       this.queryParams.page = val
       this.getSalaryList()
     },

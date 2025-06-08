@@ -8,7 +8,7 @@
             <i class="el-icon-money" />
           </div>
           <div class="data-content">
-            <div class="data-title">我的工资记录</div>
+            <div class="data-title">我的薪酬记录</div>
             <div class="data-number">{{ total }}条</div>
           </div>
         </div>
@@ -54,7 +54,7 @@
               type="text"
               size="small"
               @click="handleHistory(row)"
-            >历史工资</el-button>
+            >历史薪酬</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -73,12 +73,12 @@
       </el-row>
       <!-- 历史工资弹窗 -->
       <el-dialog
-        title="历史工资记录"
+        title="历史薪酬记录"
         :visible.sync="historyDialogVisible"
         width="800px"
       >
         <div style="text-align: center">
-          <h3 style="margin-bottom: 20px">{{ currentEmployee }}的历史工资</h3>
+          <h3 style="margin-bottom: 20px">{{ currentEmployee }}的历史薪酬</h3>
           <div
             v-for="(item, index) in salaryHistory"
             :key="index"
@@ -172,7 +172,7 @@ export default {
       this.getMySalaryList()
     },
     // 分页
-    handleCurrentChange(val) {
+    changePage(val) {
       this.queryParams.page = val
       this.getMySalaryList()
     },

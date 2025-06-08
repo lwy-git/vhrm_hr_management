@@ -136,10 +136,16 @@
           align="center"
         /> -->
         <el-table-column
+          width="150"
           label="操作"
           align="center"
         >
           <template slot-scope="scope">
+            <el-button
+              type="text"
+              size="small"
+              @click="handleHistory(scope.row)"
+            >历史绩效</el-button>
             <el-button
               size="mini"
               type="text"
@@ -332,6 +338,69 @@
           <el-button v-if="operationType !== 'view'" type="primary" @click="submitForm">确 定</el-button>
         </div>
       </el-dialog>
+      <!-- 历史绩效弹窗 -->
+      <el-dialog
+        title="历史绩效记录"
+        :visible.sync="historyDialogVisible"
+        width="800px"
+      >
+        <div style="text-align: center">
+          <h3 style="margin-bottom: 20px">{{ currentEmployee }}的历史绩效</h3>
+          <div
+            v-for="(item, index) in performanceHistory"
+            :key="index"
+            style="
+                    border: 1px solid #ebeef5;
+                    border-radius: 4px;
+                    padding: 20px;
+                    margin-bottom: 15px;
+                    background-color: #fafafa;
+                  "
+          >
+            <div
+              style="
+                      font-size: 18px;
+                      font-weight: bold;
+                      color: #409eff;
+                      margin-bottom: 15px;
+                    "
+            >
+              {{ item.evaluationPeriod }}
+            </div>
+            <div
+              style="
+                      display: flex;
+                      justify-content: space-around;
+                      margin-bottom: 10px;
+                    "
+            >
+              <span>工作质量: {{ item.workQualityScore }}分</span>
+              <span>工作效率: {{ item.workEfficiencyScore }}分</span>
+            </div>
+            <div
+              style="
+                      display: flex;
+                      justify-content: space-around;
+                      margin-bottom: 10px;
+                    "
+            >
+              <span>团队协作: {{ item.teamworkScore }}分</span>
+              <span>出勤情况: {{ item.attendanceScore }}分</span>
+            </div>
+            <div style="display: flex; justify-content: space-around;margin-bottom: 10px;">
+              <span>评估人: {{ item.evaluator }}</span>
+              <span>评语: {{ item.comments }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-around">
+              <span>总评分：<el-tag :type="getScoreTagType(item.score)">{{ item.score }}分</el-tag></span>
+              <span>等级：<el-tag :type="getLevelTagType(item.level)">{{ item.level }}</el-tag></span>
+            </div>
+          </div>
+        </div>
+        <div slot="footer">
+          <el-button @click="historyDialogVisible = false">关闭</el-button>
+        </div>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -373,6 +442,10 @@ export default {
         period: '',
         level: ''
       },
+      // 弹窗控制
+      currentEmployee: '',
+      historyDialogVisible: false,
+      performanceHistory: [],
       dialogVisible: false,
       operationType: 'add',
       performanceForm: {
@@ -467,7 +540,7 @@ export default {
       this.getPerformanceList()
       this.step = 1 // 重置后回到第一步
     },
-    handleCurrentChange(val) {
+    changePage(val) {
       this.queryParams.page = val
       this.getPerformanceList()
     },
@@ -478,6 +551,19 @@ export default {
         this.performanceForm.department = employee.departmentName
         this.performanceForm.departmentId = employee.departmentId
       }
+    },
+    // 查看历史绩效
+    async handleHistory(row) {
+      this.currentEmployee = row.employeeName
+      const { records } = await getPerformanceList({
+        page: 1,
+        pagesize: 10,
+        employeeName: this.currentEmployee,
+        period: '',
+        level: ''
+      })
+      this.performanceHistory = records || []
+      this.historyDialogVisible = true
     },
     calculateTotalScore() {
       const { workQualityScore, workEfficiencyScore, teamworkScore, attendanceScore } = this.performanceForm

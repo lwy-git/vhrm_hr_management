@@ -105,8 +105,8 @@ export default {
       isLogin: true,
       imageCodeUrl: '/api/user/imageCode', // 验证码图片地址
       formData: {
-        mobile: process.env.NODE_ENV === 'development' ? '13800000002' : '',
-        password: process.env.NODE_ENV === 'development' ? 'hm#qd@23!' : '',
+        mobile: process.env.NODE_ENV === 'development' ? '18881353791' : '',
+        password: process.env.NODE_ENV === 'development' ? 'abcd@1234' : '',
         confirmPassword: '',
         imageCode: '', // 新增验证码字段
         isAgrge: process.env.NODE_ENV === 'development'

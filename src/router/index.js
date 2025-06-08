@@ -66,7 +66,7 @@ export const constantRoutes = [
       name: 'mySalary',
       component: () => import('@/views/mySalary'),
       meta: {
-        title: '我的工资',
+        title: '我的薪酬',
         icon: 'chart'
       }
     }]
@@ -94,6 +94,19 @@ export const constantRoutes = [
       meta: {
         title: '我的绩效',
         icon: 'star'
+      }
+    }]
+  },
+  {
+    path: '/myAttendance',
+    component: Layout,
+    children: [{
+      path: '',
+      name: 'myAttendance',
+      component: () => import('@/views/myAttendance'),
+      meta: {
+        title: '考勤打卡',
+        icon: 'email'
       }
     }]
   }

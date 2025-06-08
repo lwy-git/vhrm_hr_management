@@ -85,14 +85,14 @@
     <el-dialog :visible.sync="showRoleDialog" title="分配角色">
       <!-- 弹层内容 -->
       <!-- checkbox -->
-      <el-checkbox-group v-model="roleIds">
+      <el-radio-group v-model="roleId">
         <!-- 放置n个的checkbox  要执行checkbox的存储值 item.id-->
-        <el-checkbox
+        <el-radio
           v-for="item in roleList"
           :key="item.id"
           :label="item.id"
-        >{{ item.name }}</el-checkbox>
-      </el-checkbox-group>
+        >{{ item.name }}</el-radio>
+      </el-radio-group>
       <el-row slot="footer" type="flex" justify="center">
         <el-col :span="6">
           <el-button type="primary" size="mini" @click="btnRoleOK">确定</el-button>
@@ -108,6 +108,7 @@ import { getEmployeeList, exportEmployee, delEmployee, assignRole, getEmployeeDe
 import { getEnableRoleList } from '@/api/role'
 import FileSaver from 'file-saver'
 import ImportExcel from './components/importExcel.vue'
+import store from '@/store'
 export default {
   name: 'Employee',
   components: {
@@ -128,7 +129,8 @@ export default {
       total: 0, // 记录员工的总数
       showRoleDialog: false, // 用来控制角色弹层的显示
       roleList: [], // 接收角色列表
-      roleIds: [], // 用来双向绑定数据的
+      roleId: '', // 用来双向绑定数据的
+      role: store.getters.role,
       currentUserId: null // 用来记录当前点击的用户id
     }
   },
@@ -210,24 +212,28 @@ export default {
     // 点击查看可用角色
     // 点击角色按钮弹出层
     async btnRole(id) {
-      this.showRoleDialog = true
-      const { records } = await getEnableRoleList({ page: 1, pagesize: 10, state: 1 })
-      this.roleList = records
-      console.log('roleList', this.roleList)
-      // 记录当前点击的id 因为后边 确定取消要存取给对应的用户
-      this.currentUserId = id
-      const { roleIds } = await getEmployeeDetail(id)
-      this.roleIds = roleIds
-      console.log('roleIds: ', this.roleIds)
+      if (this.role === 1) {
+        this.showRoleDialog = true
+        const { records } = await getEnableRoleList({ page: 1, pagesize: 10, state: 1 })
+        this.roleList = records
+        console.log('roleList', this.roleList)
+        // 记录当前点击的id 因为后边 确定取消要存取给对应的用户
+        this.currentUserId = id
+        const { roleIds } = await getEmployeeDetail(id)
+        this.roleId = roleIds[0]
+        console.log('roleIds: ', this.roleId)
 
-      this.showRoleDialog = true // 调整顺序
+        this.showRoleDialog = true // 调整顺序
+      } else {
+        this.$message.warning('您的权限不足,不能分配角色')
+      }
     },
     // 点击分配角色的确定
     async  btnRoleOK() {
-      console.log('roleIds: ', this.roleIds)
+      console.log('roleIds: ', this.roleId)
       await assignRole({
         id: this.currentUserId,
-        roleIds: this.roleIds
+        roleIds: [this.roleId]
       })
       this.$message.success('分配员工角色成功')
       this.showRoleDialog = false

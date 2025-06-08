@@ -221,15 +221,15 @@ export default {
         NORMAL: 1, // 正常
         LATE: 2, // 迟到
         EARLY: 3, // 早退
-        ABSENT: 4 // 旷工
-        // LATEANDEARLY: 5// 迟到且早退
+        ABSENT: 4, // 旷工
+        LATEANDEARLY: 5// 迟到且早退
       },
       statusOptions: [
         { value: 1, label: '正常' },
         { value: 2, label: '迟到' },
         { value: 3, label: '早退' },
-        { value: 4, label: '旷工' }
-        // { value: 5, label: '迟到且早退' }
+        { value: 4, label: '旷工' },
+        { value: 5, label: '异常' }
         // { value: 6, label: '请假' }
       ],
       employeeList: [],
@@ -241,7 +241,7 @@ export default {
         attendanceDate: '',
         checkinTime: '',
         checkoutTime: '',
-        status: 1,
+        status: '',
         remark: ''
       },
       rules: {
@@ -277,7 +277,8 @@ export default {
       console.log('res', res)
       const morningStartTime = res.morningStartTime // 早晨开始时间，如 "09:00"
       const afternoonEndTime = res.afternoonEndTime // 下午结束时间，如 "18:00"
-
+      console.log('morningStartTime', morningStartTime)
+      console.log('afternoonEndTime', afternoonEndTime)
       // 判断考勤状态
       const status = this.calculateAttendanceStatus(morningStartTime, afternoonEndTime, checkinTime, checkoutTime)
       console.log('status', status)
@@ -286,18 +287,18 @@ export default {
 
     // 计算考勤状态
     calculateAttendanceStatus(morningStartTime, afternoonEndTime, checkinTime, checkoutTime) {
+      // console.log(1111111)
       const morningStart = this.parseTimeWithSeconds(morningStartTime)
       const afternoonEnd = this.parseTimeWithSeconds(afternoonEndTime)
       const checkin = this.parseTimeWithSeconds(checkinTime)
       const checkout = this.parseTimeWithSeconds(checkoutTime)
-
       // 如果没有签到时间或者签退时间，视为旷工
       if (!checkin || !checkout) {
         return 4 // 旷工
       }
-      // if (checkin.getTime() > morningStart.getTime() && checkout.getTime() < afternoonEnd.getTime()) {
-      //   return 5// 迟到且早退
-      // }
+      if (checkin.getTime() > morningStart.getTime() && checkout.getTime() < afternoonEnd.getTime()) {
+        return 5// 迟到且早退异常
+      }
       // 判断迟到
       if (checkin.getTime() > morningStart.getTime()) {
         return 2 // 迟到
@@ -382,8 +383,8 @@ export default {
         [this.attendanceStatus.NORMAL]: 'success',
         [this.attendanceStatus.LATE]: 'warning',
         [this.attendanceStatus.EARLY]: 'warning',
-        [this.attendanceStatus.ABSENT]: 'danger'
-        // [this.attendanceStatus.LATEANDEARLY]: 'danger'
+        [this.attendanceStatus.ABSENT]: 'danger',
+        [this.attendanceStatus.LATEANDEARLY]: 'danger'
       }
       return typeMap[status] || ''
     },

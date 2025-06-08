@@ -272,7 +272,7 @@ export default {
       this.getPerformanceList()
     },
     // 分页
-    handleCurrentChange(val) {
+    changePage(val) {
       this.queryParams.page = val
       this.getPerformanceList()
     },

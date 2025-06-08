@@ -16,9 +16,9 @@
           style="width: 200px; margin-right: 10px"
           size="small"
         >
-          <el-option label="请假" value="leave" />
-          <el-option label="加班" value="overtime" />
-          <el-option label="离职" value="resignation" />
+          <el-option label="请假" value="0" />
+          <el-option label="加班" value="1" />
+          <el-option label="离职" value="2" />
         </el-select>
         <el-select
           v-model="queryParams.status"
@@ -26,10 +26,10 @@
           style="width: 200px; margin-right: 10px"
           size="small"
         >
-          <el-option label="待审批" value="pending" />
-          <el-option label="已通过" value="approved" />
-          <el-option label="已拒绝" value="rejected" />
-          <el-option label="已撤销" value="callbacked" />
+          <el-option label="待审批" value="0" />
+          <el-option label="已通过" value="1" />
+          <el-option label="已拒绝" value="2" />
+          <el-option label="已撤销" value="3" />
         </el-select>
         <el-button
           size="small"
@@ -44,13 +44,13 @@
         <el-table-column prop="applicant" label="申请人" />
         <el-table-column prop="type" label="申请类型">
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.type === 'leave'">请假</el-tag>
+            <el-tag v-if="scope.row.type === 0">请假</el-tag>
             <el-tag
-              v-if="scope.row.type === 'overtime'"
+              v-if="scope.row.type === 1"
               type="warning"
             >加班</el-tag>
             <el-tag
-              v-if="scope.row.type === 'resignation'"
+              v-if="scope.row.type === 2"
               type="danger"
             >离职</el-tag>
           </template>
@@ -60,19 +60,19 @@
         <el-table-column prop="status" label="状态">
           <template slot-scope="scope">
             <el-tag
-              v-if="scope.row.status === 'pending'"
+              v-if="scope.row.status === 0"
               type="info"
             >待审批</el-tag>
             <el-tag
-              v-if="scope.row.status === 'approved'"
+              v-if="scope.row.status === 1"
               type="success"
             >已通过</el-tag>
             <el-tag
-              v-if="scope.row.status === 'rejected'"
+              v-if="scope.row.status ===2"
               type="danger"
             >已拒绝</el-tag>
             <el-tag
-              v-if="scope.row.status === 'callbacked'"
+              v-if="scope.row.status === 3"
               type="warning"
             >已撤销</el-tag>
           </template>
@@ -80,13 +80,13 @@
         <el-table-column label="操作" width="200">
           <template slot-scope="scope">
             <el-button
-              v-if="scope.row.status === 'pending'"
+              v-if="scope.row.status ===0"
               type="text"
               size="mini"
               @click="handleApprove(scope.row)"
             >通过</el-button>
             <el-button
-              v-if="scope.row.status === 'pending'"
+              v-if="scope.row.status ===0"
               type="text"
               size="mini"
               @click="handleReject(scope.row)"
@@ -145,11 +145,11 @@
               <div class="approval-item">
                 <span class="label">申请类型:</span>
                 <span class="value">
-                  {{ currentRow.type === "leave"
+                  {{ currentRow.type === 0
                     ? "请假"
-                    : currentRow.type === "overtime"
+                    : currentRow.type === 1
                       ? "加班"
-                      : currentRow.type === "resignation"
+                      : currentRow.type ===2
                         ? "离职"
                         : "其他" }}
                 </span>
@@ -171,10 +171,10 @@
               <div class="approval-item">
                 <span class="label">状态:</span>
                 <span class="value">
-                  <el-tag v-if="currentRow.status === 'pending'" type="info">待审批</el-tag>
-                  <el-tag v-if="currentRow.status === 'approved'" type="success">已通过</el-tag>
-                  <el-tag v-if="currentRow.status === 'rejected'" type="danger">已拒绝</el-tag>
-                  <el-tag v-if="currentRow.status === 'callbacked'" type="warning">已撤销</el-tag>
+                  <el-tag v-if="currentRow.status ===0" type="info">待审批</el-tag>
+                  <el-tag v-if="currentRow.status ===1" type="success">已通过</el-tag>
+                  <el-tag v-if="currentRow.status ===2" type="danger">已拒绝</el-tag>
+                  <el-tag v-if="currentRow.status === 3" type="warning">已撤销</el-tag>
                 </span>
               </div>
             </el-col>
@@ -270,7 +270,7 @@ export default {
         await approveApplication(row)
         this.$message.success('审批通过成功')
         // 如果是离职申请，审批通过就删除员工
-        if (row.type === 'resignation') {
+        if (row.type === 2) {
           await delEmployee(row.applicantId)
         }
         this.getApprovalList()
@@ -319,7 +319,7 @@ export default {
       this.getApprovalList()
     },
     // 当前页改变
-    handleCurrentChange(val) {
+    changePage(val) {
       this.queryParams.page = val
       this.getApprovalList()
     }
