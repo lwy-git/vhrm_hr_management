@@ -183,6 +183,29 @@ npm run lint -- --fix
 - `transition.scss`: 过渡动画
 - `variables.scss`: 样式变量
 
+## 相关页面
+1. 登录页
+<img width="1919" height="966" alt="image" src="https://github.com/user-attachments/assets/40b9f27f-5585-4853-89ed-6451f1c20417" />
+2. 首页
+<img width="1919" height="967" alt="image" src="https://github.com/user-attachments/assets/5f01593a-6fd4-4f1c-9bee-2e8f2c95909f" />
+3. 组织架构
+<img width="1919" height="849" alt="image" src="https://github.com/user-attachments/assets/387fcd81-8375-44d9-aed9-38b89c40892e" />
+4.员工管理
+<img width="1914" height="928" alt="image" src="https://github.com/user-attachments/assets/7d809803-77ff-4701-93b2-77ceb46893e9" />
+5.角色管理
+<img width="1912" height="896" alt="image" src="https://github.com/user-attachments/assets/0ac9e795-bbc5-42a2-83c0-075d89e010ce" />
+6.权限管理
+<img width="1895" height="829" alt="image" src="https://github.com/user-attachments/assets/24ac0662-eb3b-4eab-ba14-a5c7aa599502" />
+7.考勤管理
+<img width="1914" height="928" alt="image" src="https://github.com/user-attachments/assets/86ece75d-a04f-4e06-8ab6-0cbc26cd2fdd" />
+8.申请审批
+<img width="1919" height="849" alt="image" src="https://github.com/user-attachments/assets/548813bf-07dc-4837-8a72-d00d45e10484" />
+9.绩效评估
+<img width="1908" height="961" alt="image" src="https://github.com/user-attachments/assets/3219590e-0acb-46ba-a06e-2b8161b59a96" />
+10.薪酬管理
+<img width="1913" height="907" alt="image" src="https://github.com/user-attachments/assets/0b575a4f-a737-4cf2-98c6-9a4b5bd54e65" />
+
+
 ## 浏览器支持
 
 支持现代浏览器和 IE10+：
